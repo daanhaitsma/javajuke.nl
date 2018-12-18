@@ -1,0 +1,27 @@
+{
+  "name": "my-app",
+  "version": "0.0.1",
+  "description": "My App description",
+  "author": "Thomas Stoevelaar",
+  "repository": "daanhaitsma/javajuke.nl",
+  "scripts": {
+    "start": "polymer serve",
+    "build": "polymer build",
+    "lint": "polymer lint",
+    "deploy": "polymer build && firebase deploy"
+  },
+  "dependencies": {
+    "@polymer/app-route": "^3.0.2",
+    "@polymer/iron-icons": "^3.0.1",
+    "@polymer/iron-pages": "^3.0.0-pre.15",
+    "@polymer/paper-ripple": "^3.0.1",
+    "@polymer/polymer": "^3.0.0",
+    "@webcomponents/webcomponentsjs": "^2.0.0"
+  },
+  "devDependencies": {
+    "polymer-cli": "^1.9.2"
+  },
+  "engines": {
+    "node": ">=8.0"
+  }
+}

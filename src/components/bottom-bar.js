@@ -8,14 +8,16 @@ class BottomBar extends PolymerElement {
     return html`
       <style include="shared-styles">
         .bottom-bar {
+          position: relative;
+          z-index: 2;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
-          grid-template-rows: 48px;
+          grid-template-rows: 47px;
           grid-row-gap: 16px;
           justify-items: center;
           align-items: center;
           width: 100%;
-          height: 48px;
+          height: 47px;
           background-color: #fff;
           border-top: 1px solid #eee;
         }
@@ -23,15 +25,24 @@ class BottomBar extends PolymerElement {
         .bottom-bar-button {
           position: relative;
           width: 100%;
-          height: 48px;
-          padding: 3px 0px;
+          height: 47px;
+          padding: 2.5px 0px;
           box-sizing: border-box;
           text-align: center;
           color: #757575;
+          transition: color 0.2s ease;
+        }
+
+        .bottom-bar-button.active {
+          color: var(--active-color);
         }
 
         .bottom-bar-title {
           font-size: 12px;
+        }
+
+        .ripple {
+          color: var(--active-color);
         }
 
         @supports (padding-bottom: constant(safe-area-inset-bottom)) {
@@ -45,35 +56,172 @@ class BottomBar extends PolymerElement {
             padding-bottom: env(safe-area-inset-bottom);
           }
         }
+
+        .active-track-bar {
+          position: relative;
+          width: 100%;
+          height: 0;
+          background-color: #fff;
+          color: #757575;
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-template-rows: 2px 1fr;
+          transition: height 0.2s ease-in-out;
+        }
+        .active-track-bar.active {
+          height: 48px;
+        }
+
+        .active-track-content {
+          width: 100%;
+          height: 46px;
+          box-sizing: border-box;
+          display: grid;
+          grid-template-columns: 48px 1fr 48px;
+          grid-template-rows: 1fr;
+          grid-row-gap: 8px;
+          align-items: center;
+          justify-items: center;
+        }
+        .active-track-disc {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background-color: #eee;
+          object-fit: cover;
+          border: 1px solid #bdbdbd;
+          box-sizing: border-box;
+        }
+        .active-track-info {
+          width: 100%;
+          height: 42px;
+          padding: 2px 0px;
+          display: grid;
+          grid-template-columns: 1fr;
+          grid-template-rows: 24px 18px;
+          align-items: center;
+        }
+        .active-track-title {
+          text-align: center;
+          font-weight: bold;
+          color: #757575;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .active-track-artist {
+          text-align: center;
+          font-size: 12px;
+          color: #bdbdbd;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       </style>
+      <div
+        data-action="player"
+        class$="active-track-bar[[_activePage('home', page)]]"
+        on-click="_activeTrackClick"
+      >
+        <div data-data-action="player" class="progress-bar">
+          <div
+            data-action="player"
+            class="progress"
+            style$="width: [[_getProgress(player.state.time, player.track.time)]]%;"
+          ></div>
+        </div>
+        <div data-action="player" class="active-track-content">
+          <img
+            data-action="player"
+            class="active-track-disc"
+            src="[[player.track.art]]"
+          />
+          <div data-action="player" class="active-track-info">
+            <p data-action="player" class="active-track-title">
+              [[player.track.title]]
+            </p>
+            <p data-action="player" class="active-track-artist">
+              [[player.track.artist]]
+            </p>
+          </div>
+          <div data-action="playPause" class="icon-button" on-down="_onDown">
+            <iron-icon
+              data-action="playPause"
+              icon$="[[_getIcon(player.state.playing)]]"
+            ></iron-icon>
+            <paper-ripple center></paper-ripple>
+          </div>
+        </div>
+        <paper-ripple></paper-ripple>
+      </div>
 
       <div class="bottom-bar">
-        <div class="bottom-bar-button" on-click="_home">
+        <div
+          class$="bottom-bar-button[[_activePage('home', page)]]"
+          on-click="_home"
+        >
           <iron-icon icon="home"></iron-icon>
           <p class="bottom-bar-title">Home</p>
-          <paper-ripple center></paper-ripple>
+          <paper-ripple class="ripple" center></paper-ripple>
         </div>
-        <div class="bottom-bar-button">
+        <div class$="bottom-bar-button[[_activePage('playlists', page)]]">
           <iron-icon icon="folder"></iron-icon>
-          <p class="bottom-bar-title">Library</p>
-          <paper-ripple center></paper-ripple>
+          <p class="bottom-bar-title">Playlists</p>
+          <paper-ripple class="ripple" center></paper-ripple>
         </div>
-        <div class="bottom-bar-button">
-          <iron-icon icon="settings"></iron-icon>
-          <p class="bottom-bar-title">Settings</p>
-          <paper-ripple center></paper-ripple>
+        <div class$="bottom-bar-button[[_activePage('account, page')]]">
+          <iron-icon icon="account"></iron-icon>
+          <p class="bottom-bar-title">Account</p>
+          <paper-ripple class="ripple" center></paper-ripple>
         </div>
       </div>
     `;
   }
   static get properties() {
-    return {};
+    return {
+      page: String,
+      player: Object
+    };
+  }
+
+  _activePage(page, activePage) {
+    return page === activePage ? " active" : "";
+  }
+
+  _getProgress(time, total) {
+    return (time * 100) / total;
+  }
+
+  _getIcon(playing) {
+    return playing ? "pause" : "play";
+  }
+
+  _onDown(e) {
+    // disable the ripple of the parent element
+    e.stopPropagation();
   }
 
   _home() {
     window.dispatchEvent(
       new CustomEvent("set-path", { detail: { path: "/home", history: [] } })
     );
+  }
+
+  _activeTrackClick(e) {
+    switch (e.target.dataset.action) {
+      case "player":
+        window.dispatchEvent(
+          new CustomEvent("set-path", { detail: { path: "/player" } })
+        );
+        break;
+      case "playPause":
+        window.dispatchEvent(
+          new CustomEvent("toggle-state", {
+            detail: { state: "playing", value: !this.player.state.playing }
+          })
+        );
+    }
   }
 }
 

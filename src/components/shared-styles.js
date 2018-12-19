@@ -8,11 +8,18 @@ $_documentContainer.innerHTML = `
         :root {
           --box-shadow: 0px 8px 16px -4px rgba(0, 0, 0, 0.1);
           --box-shadow-active: 0px 12px 16px -2px rgba(0, 0, 0, 0.1);
+          --active-color: #fb8c00;
         }
 
         p {
           margin: 0;
+        }
+
+        .card {
+          background-color: #fff;
           color: #757575;
+          border-radius: 8px;
+          box-shadow: var(--box-shadow);
         }
 
         .fab {
@@ -38,6 +45,19 @@ $_documentContainer.innerHTML = `
           height: 24px;
           color: #757575;
           border-radius: 50%;
+        }
+
+        .progress-bar {
+          width: 100%;
+          height: 2px;
+          background-color: #eee;
+        }
+
+        .progress {
+          position: relative;
+          max-width: 100%;
+          height: 2px;
+          background-color: #757575;
         }
       </style>
     </template>

@@ -22,7 +22,7 @@ class AppShell extends PolymerElement {
         .content {
           display: grid;
           grid-template-columns: 1fr;
-          grid-template-rows: 1fr 49px;
+          grid-template-rows: 1fr auto;
         }
         .content-page {
           overflow-y: auto;
@@ -59,7 +59,7 @@ class AppShell extends PolymerElement {
           ></home-page>
           <div name="404">404</div>
         </iron-pages>
-        <bottom-bar></bottom-bar>
+        <bottom-bar page="[[routeData.page]]" player="[[player]]"></bottom-bar>
       </div>
     `;
   }
@@ -73,7 +73,7 @@ class AppShell extends PolymerElement {
       },
       page: {
         type: String,
-        value: "home"
+        value: ""
       },
       offline: {
         type: Boolean,
@@ -151,8 +151,8 @@ class AppShell extends PolymerElement {
 
     window.addEventListener("set-track", e => this._setTrack(e.detail.track));
     window.addEventListener("set-time", e => this._setTime(e.detail.time));
-    window.addEventListener("set-playing", e =>
-      this._setPlaying(e.detail.playing)
+    window.addEventListener("toggle-state", e =>
+      this._toggleState(e.detail.state, e.detail.value)
     );
   }
 
@@ -213,11 +213,11 @@ class AppShell extends PolymerElement {
     this.set("player.state.time", time);
   }
 
-  _setPlaying(playing) {
-    if (this.player.state.time === this.player.track.time) {
+  _toggleState(state, value) {
+    if (state === "playing" && this.player.state.time === this.player.track.time) {
       this.set("player.state.time", 0);
     }
-    this.set("player.state.playing", playing);
+    this.set(`player.state.${state}`, value);
   }
 
   _isActive(activePage, page) {

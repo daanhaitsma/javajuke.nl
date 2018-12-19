@@ -8,17 +8,22 @@ class HomePage extends PolymerElement {
   static get template() {
     return html`
       <style include="shared-styles">
+        .content-grid {
+          display: grid;
+          width: 100%;
+          padding: 16px;
+          grid-template-columns: 100%;
+          grid-auto-rows: 64px;
+          grid-row-gap: 16px;
+          box-sizing: border-box;
+        }
+
         .track-card {
           position: relative;
           display: grid;
-          margin: 16px;
           padding: 8px;
-          width: calc(100% - 32px);
+          width: 100%;
           height: 64px;
-          background-color: #fff;
-          color: #757575;
-          border-radius: 8px;
-          box-shadow: var(--box-shadow);
           box-sizing: border-box;
           grid-template-columns: 48px 1fr 48px;
           grid-template-rows: 1fr;
@@ -47,6 +52,10 @@ class HomePage extends PolymerElement {
         }
         .track-title {
           font-weight: 600;
+          color: #757575;
+        }
+        .track-title.active {
+          color: var(--active-color);
         }
         .track-artist {
           color: #bdbdbd;
@@ -57,25 +66,53 @@ class HomePage extends PolymerElement {
         }
       </style>
 
-      <div>
+      <div class="content-grid">
         <template is="dom-repeat" items="[[playlist]]" as="track">
-          <div data-track$="[[track.id]]" class="track-card" on-click="_play">
+          <div
+            data-action="play"
+            data-track$="[[track.id]]"
+            class="card track-card"
+            on-click="_trackClick"
+          >
             <img
+              data-action="play"
               data-track$="[[track.id]]"
               class="track-card-disc"
               src="[[track.art]]"
               alt=""
             />
-            <div data-track$="[[track.id]]" class="track-card-content">
-              <p data-track$="[[track.id]]" class="track-title">
+            <div
+              data-action="play"
+              data-track$="[[track.id]]"
+              class="track-card-content"
+            >
+              <p
+                data-action="play"
+                data-track$="[[track.id]]"
+                class$="track-title[[_active(track.id, player.track.id)]]"
+              >
                 [[track.title]]
               </p>
-              <p data-track$="[[track.id]]" class="track-artist">
+              <p
+                data-action="play"
+                data-track$="[[track.id]]"
+                class="track-artist"
+              >
                 [[track.artist]]
               </p>
             </div>
-            <div data-track$="[[track.id]]" class="icon-button">
-              <iron-icon data-track$="[[track.id]]" icon="play"></iron-icon>
+            <div
+              data-action="options"
+              data-track$="[[track.id]]"
+              class="icon-button"
+              on-down="_onDown"
+            >
+              <iron-icon
+                data-action="options"
+                data-track$="[[track.id]]"
+                icon="options"
+              ></iron-icon>
+              <paper-ripple center></paper-ripple>
             </div>
             <paper-ripple></paper-ripple>
           </div>
@@ -100,19 +137,40 @@ class HomePage extends PolymerElement {
     }
   }
 
-  _play(e) {
-    window.dispatchEvent(
-      new CustomEvent("set-track", {
-        detail: {
-          track: this.playlist.find(item => {
-            return item.id === Number(e.target.dataset.track);
-          })
+  _active(track, activeTrack) {
+    return track === activeTrack ? " active" : "";
+  }
+
+  _onDown(e) {
+    // disable the ripple of the parent element
+    e.stopPropagation();
+  }
+
+  _trackClick(e) {
+    switch (e.target.dataset.action) {
+      case "play":
+        if (this.player.track.id !== Number(e.target.dataset.track)) {
+          window.dispatchEvent(
+            new CustomEvent("set-track", {
+              detail: {
+                track: this.playlist.find(item => {
+                  return item.id === Number(e.target.dataset.track);
+                })
+              }
+            })
+          );
         }
-      })
-    );
-    window.dispatchEvent(
-      new CustomEvent("set-path", { detail: { path: "/player" } })
-    );
+        // window.dispatchEvent(
+        //   new CustomEvent("set-path", { detail: { path: "/player" } })
+        // );
+        break;
+      case "options":
+        let track = this.playlist.find(item => {
+          return item.id === Number(e.target.dataset.track);
+        });
+        console.log(`${track.title} - ${track.artist}`);
+        break;
+    }
   }
 }
 

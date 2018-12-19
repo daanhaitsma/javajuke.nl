@@ -81,19 +81,6 @@ class PlayerPage extends PolymerElement {
           padding: 8px 0px;
         }
 
-        .progress-bar {
-          width: 100%;
-          height: 2px;
-          background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        .progress {
-          position: relative;
-          max-width: 100%;
-          height: 2px;
-          background-color: #757575;
-        }
-
         .time {
           font-size: 12px;
           color: #757575;
@@ -104,6 +91,18 @@ class PlayerPage extends PolymerElement {
           align-self: center;
           justify-self: center;
         }
+
+        .ripple {
+          color: var(--active-color);
+        }
+
+        .ripple.active {
+          color: #757575;
+        }
+
+        .icon-button.active {
+          color: var(--active-color);
+        }
       </style>
       <div class="content-grid">
         <img class="disc" src="[[player.track.art]]" />
@@ -111,7 +110,9 @@ class PlayerPage extends PolymerElement {
           <h1>[[player.track.title]]</h1>
           <h2>[[player.track.artist]]</h2>
           <div class="progress-container">
-            <div class="time">[[_convertTime(player.state.time)]]</div>
+            <div class="time" on-click="_restart">
+              [[_convertTime(player.state.time)]]
+            </div>
             <div id="progress" class="progress-bar-container" on-click="_click">
               <div class="progress-bar">
                 <div
@@ -123,25 +124,25 @@ class PlayerPage extends PolymerElement {
             <div class="time">[[_convertTime(player.track.time)]]</div>
           </div>
           <div class="controls">
-            <div class="icon-button">
+            <div class$="icon-button[[_active(player.state.shuffle)]]" on-click="_shuffle">
               <iron-icon icon="shuffle"></iron-icon>
-              <paper-ripple></paper-ripple>
+              <paper-ripple class$="ripple[[_active(player.state.shuffle)]]" center></paper-ripple>
             </div>
             <div class="fab">
               <iron-icon icon="skip-previous"></iron-icon>
-              <paper-ripple></paper-ripple>
+              <paper-ripple center></paper-ripple>
             </div>
             <div class="fab play" on-click="_playPause">
               <iron-icon icon$="[[_getIcon(player.state.playing)]]"></iron-icon>
-              <paper-ripple></paper-ripple>
+              <paper-ripple center></paper-ripple>
             </div>
             <div class="fab">
               <iron-icon icon="skip-next"></iron-icon>
-              <paper-ripple></paper-ripple>
+              <paper-ripple center></paper-ripple>
             </div>
-            <div class="icon-button">
+            <div class$="icon-button[[_active(player.state.loop)]]" on-click="_loop">
               <iron-icon icon="repeat"></iron-icon>
-              <paper-ripple></paper-ripple>
+              <paper-ripple class$="ripple[[_active(player.state.loop)]]" center></paper-ripple>
             </div>
           </div>
         </div>
@@ -164,6 +165,10 @@ class PlayerPage extends PolymerElement {
     }
   }
 
+  _active(active) {
+    return active ? " active" : "";
+  }
+
   _convertTime(time) {
     let minutes = time % 60;
     if (minutes < 10) {
@@ -180,12 +185,30 @@ class PlayerPage extends PolymerElement {
     return playing ? "pause" : "play";
   }
 
+  _restart() {
+    window.dispatchEvent(new CustomEvent("set-time", { detail: { time: 0 } }));
+  }
+
+  _shuffle() {
+    window.dispatchEvent(
+      new CustomEvent("toggle-state", {
+        detail: { state: "shuffle", value: !this.player.state.shuffle }
+      })
+    );
+  }
+
+  _loop() {
+    window.dispatchEvent(
+      new CustomEvent("toggle-state", {
+        detail: { state: "loop", value: !this.player.state.loop }
+      })
+    );
+  }
+
   _playPause() {
     window.dispatchEvent(
-      new CustomEvent("set-playing", {
-        detail: {
-          playing: !this.player.state.playing
-        }
+      new CustomEvent("toggle-state", {
+        detail: { state: "playing", value: !this.player.state.playing }
       })
     );
   }

@@ -1,9 +1,7 @@
 {
   "entrypoint": "index.html",
   "shell": "src/components/app-shell.js",
-  "sources": [
-    "assets/**/*"
-  ],
+  "sources": ["assets/**/*"],
   "extraDependencies": [
     "manifest.json",
     "node_modules/@webcomponents/webcomponentsjs/*.js",
@@ -13,7 +11,8 @@
   "builds": [
     {
       "js": {
-        "minify": true
+        "minify": true,
+        "transformModulesToAmd": true
       },
       "css": {
         "minify": true
@@ -28,8 +27,6 @@
   "moduleResolution": "node",
   "npm": true,
   "lint": {
-    "rules": [
-      "polymer-3"
-    ]
+    "rules": ["polymer-3"]
   }
 }

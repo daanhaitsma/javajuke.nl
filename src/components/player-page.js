@@ -22,8 +22,8 @@ class PlayerPage extends PolymerElement {
           width: 60vw;
           height: 60vw;
           border-radius: 50%;
-          box-shadow: var(--box-shadow),
-            0 0 0 32px rgba(0, 0, 0, 0.05), 0 0 0 64px rgba(0, 0, 0, 0.05);
+          box-shadow: var(--box-shadow), 0 0 0 32px rgba(0, 0, 0, 0.05),
+            0 0 0 64px rgba(0, 0, 0, 0.05);
           background-color: #fff;
           object-fit: cover;
           align-self: end;
@@ -64,7 +64,7 @@ class PlayerPage extends PolymerElement {
           align-items: center;
         }
 
-        .progress-bar-container {
+        .progress-container {
           display: grid;
           width: 100%;
           height: 18px;
@@ -73,6 +73,12 @@ class PlayerPage extends PolymerElement {
           grid-column-gap: 8px;
           justify-items: center;
           align-items: center;
+        }
+
+        .progress-bar-container {
+          width: 100%;
+          height: 2px;
+          padding: 8px 0px;
         }
 
         .progress-bar {
@@ -104,13 +110,15 @@ class PlayerPage extends PolymerElement {
         <div class="info">
           <h1>[[player.track.title]]</h1>
           <h2>[[player.track.artist]]</h2>
-          <div class="progress-bar-container">
+          <div class="progress-container">
             <div class="time">[[_convertTime(player.state.time)]]</div>
-            <div class="progress-bar">
-              <div
-                class="progress"
-                style$="width: [[_getProgress(player.state.time, player.track.time)]]%;"
-              ></div>
+            <div id="progress" class="progress-bar-container" on-click="_click">
+              <div class="progress-bar">
+                <div
+                  class="progress"
+                  style$="width: [[_getProgress(player.state.time, player.track.time)]]%;"
+                ></div>
+              </div>
             </div>
             <div class="time">[[_convertTime(player.track.time)]]</div>
           </div>
@@ -123,7 +131,7 @@ class PlayerPage extends PolymerElement {
               <iron-icon icon="skip-previous"></iron-icon>
               <paper-ripple></paper-ripple>
             </div>
-            <div class="fab play">
+            <div class="fab play" on-click="_playPause">
               <iron-icon icon$="[[_getIcon(player.state.playing)]]"></iron-icon>
               <paper-ripple></paper-ripple>
             </div>
@@ -170,6 +178,29 @@ class PlayerPage extends PolymerElement {
 
   _getIcon(playing) {
     return playing ? "pause" : "play";
+  }
+
+  _playPause() {
+    window.dispatchEvent(
+      new CustomEvent("set-playing", {
+        detail: {
+          playing: !this.player.state.playing
+        }
+      })
+    );
+  }
+
+  _click(e) {
+    let position = e.clientX - this.$.progress.offsetLeft;
+    let total = this.$.progress.offsetWidth;
+    let percentage = position / total;
+    window.dispatchEvent(
+      new CustomEvent("set-time", {
+        detail: {
+          time: Math.round(this.player.track.time * percentage)
+        }
+      })
+    );
   }
 }
 

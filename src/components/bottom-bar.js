@@ -1,11 +1,12 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "../../assets/images/icons/icon-set.js";
+import "./shared-styles.js";
 
 class BottomBar extends PolymerElement {
   static get template() {
     return html`
-      <style>
+      <style include="shared-styles">
         .bottom-bar {
           display: grid;
           grid-template-columns: 1fr 1fr 1fr;
@@ -29,8 +30,7 @@ class BottomBar extends PolymerElement {
           color: #757575;
         }
 
-        p {
-          margin: 0;
+        .bottom-bar-title {
           font-size: 12px;
         }
 
@@ -48,19 +48,19 @@ class BottomBar extends PolymerElement {
       </style>
 
       <div class="bottom-bar">
-        <div class="bottom-bar-button">
+        <div class="bottom-bar-button" on-click="_home">
           <iron-icon icon="home"></iron-icon>
-          <p>Home</p>
-          <paper-ripple center></paper-ripple>
-        </div>
-        <div class="bottom-bar-button">
-          <iron-icon icon="search"></iron-icon>
-          <p>Search</p>
+          <p class="bottom-bar-title">Home</p>
           <paper-ripple center></paper-ripple>
         </div>
         <div class="bottom-bar-button">
           <iron-icon icon="folder"></iron-icon>
-          <p>Library</p>
+          <p class="bottom-bar-title">Library</p>
+          <paper-ripple center></paper-ripple>
+        </div>
+        <div class="bottom-bar-button">
+          <iron-icon icon="settings"></iron-icon>
+          <p class="bottom-bar-title">Settings</p>
           <paper-ripple center></paper-ripple>
         </div>
       </div>
@@ -68,6 +68,12 @@ class BottomBar extends PolymerElement {
   }
   static get properties() {
     return {};
+  }
+
+  _home() {
+    window.dispatchEvent(
+      new CustomEvent("set-path", { detail: { path: "/home", history: [] } })
+    );
   }
 }
 

@@ -1,7 +1,7 @@
 {
-  "name": "My App",
-  "short_name": "My App",
-  "description": "My App description",
+  "name": "JavaJuke",
+  "short_name": "JavaJuke",
+  "description": "De magie van een jukebox in de 21ste eeuw!",
   "icons": [
     {
       "src": "assets/images/manifest/icon-192x192.png",

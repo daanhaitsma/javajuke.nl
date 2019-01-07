@@ -1,13 +1,39 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/polymer/lib/elements/dom-repeat.js";
+import "@polymer/app-route/app-route.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "../../assets/images/icons/icon-set.js";
 import "./shared-styles.js";
 
-class HomePage extends PolymerElement {
+class PlaylistPage extends PolymerElement {
   static get template() {
     return html`
       <style include="shared-styles">
+        .playlist-content {
+          width: 100%;
+          padding: 16px;
+          box-sizing: border-box;
+        }
+
+        .playlist-play {
+          position: relative;
+          margin: 16px auto 0px auto;
+          width: 128px;
+          height: 32px;
+          line-height: 32px;
+          text-align: center;
+          font-weight: 600;
+          color: white;
+          border-radius: 24px;
+          background-color: var(--active-color);
+          box-shadow: var(--box-shadow);
+          transition: box-shadow 0.2s ease;
+        }
+
+        .playlist-play:active {
+          box-shadow: var(--box-shadow-active);
+        }
+
         .content-grid {
           display: grid;
           width: 100%;
@@ -66,8 +92,16 @@ class HomePage extends PolymerElement {
         }
       </style>
 
+      <app-route route="{{route}}" pattern="/:playlist" data="{{routeData}}">
+      </app-route>
+
+      <div class="playlist-content">
+        <p class="title">[[playlist.title]]</p>
+        <p class="subtitle">by [[playlist.author]]</p>
+        <div class="playlist-play">PLAY<paper-ripple></paper-ripple></div>
+      </div>
       <div class="content-grid">
-        <template is="dom-repeat" items="[[tracks]]" as="track">
+        <template is="dom-repeat" items="[[playlist.tracks]]" as="track">
           <div
             data-action="play"
             data-track$="[[track.id]]"
@@ -122,13 +156,32 @@ class HomePage extends PolymerElement {
   }
   static get properties() {
     return {
+      route: Object,
+      routeData: Object,
       active: {
         type: Boolean,
         observer: "_activeChanged"
       },
       player: Object,
-      tracks: Array
+      playlists: Array,
+      playlist: Object
     };
+  }
+
+  static get observers() {
+    return ["_playlistChanged(routeData.playlist)"];
+  }
+
+  _playlistChanged(playlist) {
+    playlist = Number(playlist);
+    if (playlist > 0) {
+      this.set(
+        "playlist",
+        this.playlists.find(item => {
+          return item.id === playlist;
+        })
+      );
+    }
   }
 
   _activeChanged(active) {
@@ -153,7 +206,7 @@ class HomePage extends PolymerElement {
           window.dispatchEvent(
             new CustomEvent("set-track", {
               detail: {
-                track: this.tracks.find(item => {
+                track: this.playlist.tracks.find(item => {
                   return item.id === Number(e.target.dataset.track);
                 })
               }
@@ -165,7 +218,7 @@ class HomePage extends PolymerElement {
         // );
         break;
       case "options":
-        let track = this.tracks.find(item => {
+        let track = this.playlist.tracks.find(item => {
           return item.id === Number(e.target.dataset.track);
         });
         console.log(`${track.title} - ${track.artist}`);
@@ -174,4 +227,4 @@ class HomePage extends PolymerElement {
   }
 }
 
-window.customElements.define("home-page", HomePage);
+window.customElements.define("playlist-page", PlaylistPage);

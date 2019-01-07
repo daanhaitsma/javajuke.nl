@@ -30,24 +30,6 @@ class PlayerPage extends PolymerElement {
           justify-self: center;
         }
 
-        h1 {
-          text-align: center;
-          color: #757575;
-          margin: 0;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        h2 {
-          text-align: center;
-          color: #bdbdbd;
-          margin: 0;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
         .play {
           padding: 16px;
         }
@@ -107,8 +89,8 @@ class PlayerPage extends PolymerElement {
       <div class="content-grid">
         <img class="disc" src="[[player.track.art]]" />
         <div class="info">
-          <h1>[[player.track.title]]</h1>
-          <h2>[[player.track.artist]]</h2>
+          <p class="title">[[player.track.title]]</p>
+          <p class="subtitle">[[player.track.artist]]</p>
           <div class="progress-container">
             <div class="time" on-click="_restart">
               [[_convertTime(player.state.time)]]
@@ -116,7 +98,7 @@ class PlayerPage extends PolymerElement {
             <div id="progress" class="progress-bar-container" on-click="_click">
               <div class="progress-bar">
                 <div
-                  class="progress"
+                  class$="progress[[_active(player.state.playing)]]"
                   style$="width: [[_getProgress(player.state.time, player.track.time)]]%;"
                 ></div>
               </div>
@@ -124,9 +106,15 @@ class PlayerPage extends PolymerElement {
             <div class="time">[[_convertTime(player.track.time)]]</div>
           </div>
           <div class="controls">
-            <div class$="icon-button[[_active(player.state.shuffle)]]" on-click="_shuffle">
+            <div
+              class$="icon-button[[_active(player.state.shuffle)]]"
+              on-click="_shuffle"
+            >
               <iron-icon icon="shuffle"></iron-icon>
-              <paper-ripple class$="ripple[[_active(player.state.shuffle)]]" center></paper-ripple>
+              <paper-ripple
+                class$="ripple[[_active(player.state.shuffle)]]"
+                center
+              ></paper-ripple>
             </div>
             <div class="fab">
               <iron-icon icon="skip-previous"></iron-icon>
@@ -140,9 +128,15 @@ class PlayerPage extends PolymerElement {
               <iron-icon icon="skip-next"></iron-icon>
               <paper-ripple center></paper-ripple>
             </div>
-            <div class$="icon-button[[_active(player.state.loop)]]" on-click="_loop">
+            <div
+              class$="icon-button[[_active(player.state.loop)]]"
+              on-click="_loop"
+            >
               <iron-icon icon="repeat"></iron-icon>
-              <paper-ripple class$="ripple[[_active(player.state.loop)]]" center></paper-ripple>
+              <paper-ripple
+                class$="ripple[[_active(player.state.loop)]]"
+                center
+              ></paper-ripple>
             </div>
           </div>
         </div>

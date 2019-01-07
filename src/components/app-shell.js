@@ -35,7 +35,12 @@ class AppShell extends PolymerElement {
       </style>
 
       <app-location route="{{route}}"></app-location>
-      <app-route route="{{route}}" pattern="/:page" data="{{routeData}}">
+      <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"
+      >
       </app-route>
 
       <div class="content">
@@ -54,9 +59,21 @@ class AppShell extends PolymerElement {
           <home-page
             name="home"
             player="[[player]]"
-            playlist="[[playlist]]"
+            tracks="[[tracks]]"
             active="[[_isActive(page, 'home')]]"
           ></home-page>
+          <playlists-page
+            name="playlists"
+            playlists="[[playlists]]"
+            active="[[_isActive(page, 'playlists')]]"
+          ></playlists-page>
+          <playlist-page
+            name="playlist"
+            player="[[player]]"
+            playlists="[[playlists]]"
+            route="[[subroute]]"
+            active="[[_isActive(page, 'playlist')]]"
+          ></playlist-page>
           <div name="404">404</div>
         </iron-pages>
         <bottom-bar page="[[routeData.page]]" player="[[player]]"></bottom-bar>
@@ -67,6 +84,7 @@ class AppShell extends PolymerElement {
     return {
       route: Object,
       routeData: Object,
+      subroute: Object,
       history: {
         type: Array,
         value: []
@@ -83,7 +101,7 @@ class AppShell extends PolymerElement {
         type: Object,
         value: {
           track: {
-            id: 0,
+            id: 1,
             title: "Sick Boy",
             art: "https://msprojectsound.com/images/153790132747790588.jpg",
             artist: "The Chainsmokers",
@@ -97,23 +115,67 @@ class AppShell extends PolymerElement {
           }
         }
       },
-      playlist: {
+      tracks: {
         type: Array,
         value: [
           {
-            id: 0,
+            id: 1,
             title: "Sick Boy",
             art: "https://msprojectsound.com/images/153790132747790588.jpg",
             artist: "The Chainsmokers",
             time: 193
           },
           {
-            id: 1,
+            id: 2,
             title: "Everybody Hates Me",
             art:
               "https://images-na.ssl-images-amazon.com/images/I/51ukIAM3foL._SS500.jpg",
             artist: "The Chainsmokers",
             time: 224
+          }
+        ]
+      },
+      playlists: {
+        type: Array,
+        value: [
+          {
+            id: 1,
+            title: "Hollandse Hits",
+            author: "Daan Botter",
+            isYours: false,
+            tracks: [
+              {
+                id: 1,
+                title: "Sick Boy",
+                art: "https://msprojectsound.com/images/153790132747790588.jpg",
+                artist: "The Chainsmokers",
+                time: 193
+              },
+              {
+                id: 2,
+                title: "Everybody Hates Me",
+                art:
+                  "https://images-na.ssl-images-amazon.com/images/I/51ukIAM3foL._SS500.jpg",
+                artist: "The Chainsmokers",
+                time: 224
+              }
+            ]
+          },
+          {
+            id: 2,
+            title: "Chill Hits",
+            author: "Thomas Stoevelaar",
+            isYours: true,
+            tracks: [
+              {
+                id: 2,
+                title: "Everybody Hates Me",
+                art:
+                  "https://images-na.ssl-images-amazon.com/images/I/51ukIAM3foL._SS500.jpg",
+                artist: "The Chainsmokers",
+                time: 224
+              }
+            ]
           }
         ]
       }
@@ -177,6 +239,12 @@ class AppShell extends PolymerElement {
       case "home":
         import("./home-page.js");
         break;
+      case "playlists":
+        import("./playlists-page.js");
+        break;
+      case "playlist":
+        import("./playlist-page.js");
+        break;
       case "404":
         // import("./404-page.js");
         break;
@@ -214,7 +282,10 @@ class AppShell extends PolymerElement {
   }
 
   _toggleState(state, value) {
-    if (state === "playing" && this.player.state.time === this.player.track.time) {
+    if (
+      state === "playing" &&
+      this.player.state.time === this.player.track.time
+    ) {
       this.set("player.state.time", 0);
     }
     this.set(`player.state.${state}`, value);

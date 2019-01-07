@@ -8,11 +8,33 @@ $_documentContainer.innerHTML = `
         :root {
           --box-shadow: 0px 8px 16px -4px rgba(0, 0, 0, 0.1);
           --box-shadow-active: 0px 12px 16px -2px rgba(0, 0, 0, 0.1);
-          --active-color: #fb8c00;
+          --active-color: #26A69A;
         }
 
         p {
           margin: 0;
+        }
+
+        p.title {
+          font-size: 32px;
+          font-weight: 600;
+          text-align: center;
+          color: #757575;
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        p.subtitle {
+          font-size: 24px;
+          font-weight: 600;
+          text-align: center;
+          color: #bdbdbd;
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .card {
@@ -31,7 +53,7 @@ $_documentContainer.innerHTML = `
           border-radius: 50%;
           background-color: #fff;
           box-shadow: var(--box-shadow);
-          transition: box-shadow 0.2s;
+          transition: box-shadow 0.2s ease;
         }
 
         .fab:active {
@@ -58,6 +80,10 @@ $_documentContainer.innerHTML = `
           max-width: 100%;
           height: 2px;
           background-color: #757575;
+          transition: background-color 0.2s ease;
+        }
+        .progress.active {
+          background-color: var(--active-color);
         }
       </style>
     </template>

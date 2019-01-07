@@ -121,13 +121,13 @@ class BottomBar extends PolymerElement {
       </style>
       <div
         data-action="player"
-        class$="active-track-bar[[_activePage('home', page)]]"
+        class$="active-track-bar[[_showActive(page)]]"
         on-click="_activeTrackClick"
       >
         <div data-data-action="player" class="progress-bar">
           <div
             data-action="player"
-            class="progress"
+            class$="progress[[_active(player.state.playing)]]"
             style$="width: [[_getProgress(player.state.time, player.track.time)]]%;"
           ></div>
         </div>
@@ -165,10 +165,18 @@ class BottomBar extends PolymerElement {
           <p class="bottom-bar-title">Home</p>
           <paper-ripple class="ripple" center></paper-ripple>
         </div>
-        <div class$="bottom-bar-button[[_activePage('playlists', page)]]">
-          <iron-icon icon="folder"></iron-icon>
-          <p class="bottom-bar-title">Playlists</p>
-          <paper-ripple class="ripple" center></paper-ripple>
+        <div
+          class$="bottom-bar-button[[_activePage('playlists', page)]]"
+          data-path="/playlists"
+          on-click="_navigate"
+        >
+          <iron-icon data-path="/playlists" icon="folder"></iron-icon>
+          <p data-path="/playlists" class="bottom-bar-title">Playlists</p>
+          <paper-ripple
+            data-path="/playlists"
+            class="ripple"
+            center
+          ></paper-ripple>
         </div>
         <div class$="bottom-bar-button[[_activePage('account, page')]]">
           <iron-icon icon="account"></iron-icon>
@@ -189,12 +197,21 @@ class BottomBar extends PolymerElement {
     return page === activePage ? " active" : "";
   }
 
+  _showActive(page) {
+    let pages = ["home", "playlists", "playlist"];
+    return pages.includes(page) ? " active" : "";
+  }
+
   _getProgress(time, total) {
     return (time * 100) / total;
   }
 
   _getIcon(playing) {
     return playing ? "pause" : "play";
+  }
+
+  _active(active) {
+    return active ? " active" : "";
   }
 
   _onDown(e) {
@@ -204,7 +221,17 @@ class BottomBar extends PolymerElement {
 
   _home() {
     window.dispatchEvent(
-      new CustomEvent("set-path", { detail: { path: "/home", history: [] } })
+      new CustomEvent("set-path", {
+        detail: { path: "/home", history: [] }
+      })
+    );
+  }
+
+  _navigate(e) {
+    window.dispatchEvent(
+      new CustomEvent("set-path", {
+        detail: { path: e.target.dataset.path, history: ["/home"] }
+      })
     );
   }
 

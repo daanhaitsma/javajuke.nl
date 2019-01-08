@@ -64,6 +64,7 @@ class AppShell extends PolymerElement {
           ></home-page>
           <playlists-page
             name="playlists"
+            tracks="[[tracks]]"
             playlists="[[playlists]]"
             active="[[_isActive(page, 'playlists')]]"
           ></playlists-page>
@@ -100,13 +101,7 @@ class AppShell extends PolymerElement {
       player: {
         type: Object,
         value: {
-          track: {
-            id: 1,
-            title: "Sick Boy",
-            art: "https://msprojectsound.com/images/153790132747790588.jpg",
-            artist: "The Chainsmokers",
-            time: 193
-          },
+          track: null,
           state: {
             playing: false,
             shuffle: false,
@@ -226,6 +221,7 @@ class AppShell extends PolymerElement {
       player.state.time === player.track.time
     ) {
       this.set("player.state.playing", false);
+      this.set("player.track", null);
     }
   }
 

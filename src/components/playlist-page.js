@@ -43,6 +43,18 @@ class PlaylistPage extends PolymerElement {
           grid-row-gap: 16px;
           box-sizing: border-box;
         }
+        @media screen and (min-width: 640px) {
+          .content-grid {
+            grid-template-columns: 1fr 1fr;
+            grid-column-gap: 16px;
+          }
+        }
+        @media screen and (min-width: 1280px) {
+          .content-grid {
+            padding-left: calc(50% - 624px);
+            padding-right: calc(50% - 624px);
+          }
+        }
 
         .track-card {
           position: relative;
@@ -202,7 +214,11 @@ class PlaylistPage extends PolymerElement {
   _trackClick(e) {
     switch (e.target.dataset.action) {
       case "play":
-        if (this.player.track.id !== Number(e.target.dataset.track)) {
+        if (
+          (this.player.track &&
+            this.player.track.id !== Number(e.target.dataset.track)) ||
+          !this.player.track
+        ) {
           window.dispatchEvent(
             new CustomEvent("set-track", {
               detail: {
@@ -221,7 +237,7 @@ class PlaylistPage extends PolymerElement {
         let track = this.playlist.tracks.find(item => {
           return item.id === Number(e.target.dataset.track);
         });
-        console.log(`${track.title} - ${track.artist}`);
+        console.log(`Track: ${track.title} - ${track.artist}`);
         break;
     }
   }

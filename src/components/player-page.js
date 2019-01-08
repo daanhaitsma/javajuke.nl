@@ -19,8 +19,8 @@ class PlayerPage extends PolymerElement {
         }
 
         .disc {
-          width: 60vw;
-          height: 60vw;
+          width: 216px;
+          height: 216px;
           border-radius: 50%;
           box-shadow: var(--box-shadow), 0 0 0 32px rgba(0, 0, 0, 0.05),
             0 0 0 64px rgba(0, 0, 0, 0.05);
@@ -37,8 +37,7 @@ class PlayerPage extends PolymerElement {
         .controls {
           display: grid;
           width: 280px;
-          margin: auto;
-          margin-top: 16px;
+          margin: 16px auto;
           grid-template-columns: 1fr 1fr auto 1fr 1fr;
           grid-template-rows: 1fr;
           grid-column-gap: 16px;
@@ -49,7 +48,9 @@ class PlayerPage extends PolymerElement {
         .progress-container {
           display: grid;
           width: 100%;
+          max-width: 640px;
           height: 18px;
+          margin: auto;
           grid-template-columns: 32px 1fr 32px;
           grid-template-rows: 1fr;
           grid-column-gap: 8px;
@@ -87,7 +88,7 @@ class PlayerPage extends PolymerElement {
         }
       </style>
       <div class="content-grid">
-        <img class="disc" src="[[player.track.art]]" />
+        <img class="disc" src="[[_getCoverArt(player.track.art)]]" />
         <div class="info">
           <p class="title">[[player.track.title]]</p>
           <p class="subtitle">[[player.track.artist]]</p>
@@ -153,9 +154,23 @@ class PlayerPage extends PolymerElement {
     };
   }
 
+  static get observers() {
+    return ["_trackChanged(player.track)"];
+  }
+
   _activeChanged(active) {
     if (active) {
       console.log(active);
+    }
+  }
+
+  _trackChanged(track) {
+    if (!track) {
+      window.dispatchEvent(
+        new CustomEvent("set-path", {
+          detail: { path: "/home", history: [] }
+        })
+      );
     }
   }
 
@@ -164,19 +179,27 @@ class PlayerPage extends PolymerElement {
   }
 
   _convertTime(time) {
-    let minutes = time % 60;
-    if (minutes < 10) {
-      minutes = `0${minutes}`;
+    if (time) {
+      let minutes = time % 60;
+      if (minutes < 10) {
+        minutes = `0${minutes}`;
+      }
+      return `${Math.floor(time / 60)}:${minutes}`;
+    } else {
+      return "0:00";
     }
-    return `${Math.floor(time / 60)}:${minutes}`;
   }
 
   _getProgress(time, total) {
-    return (time * 100) / total;
+    return (time * 100) / total || 0;
   }
 
   _getIcon(playing) {
     return playing ? "pause" : "play";
+  }
+
+  _getCoverArt(coverArt) {
+    return coverArt || "../../assets/images/icons/default_cover_art.svg";
   }
 
   _restart() {

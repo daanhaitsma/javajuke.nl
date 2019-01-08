@@ -18,6 +18,18 @@ class PlaylistsPage extends PolymerElement {
           grid-row-gap: 16px;
           box-sizing: border-box;
         }
+        @media screen and (min-width: 640px) {
+          .content-grid {
+            grid-template-columns: 1fr 1fr;
+            grid-column-gap: 16px;
+          }
+        }
+        @media screen and (min-width: 1280px) {
+          .content-grid {
+            padding-left: calc(50% - 624px);
+            padding-right: calc(50% - 624px);
+          }
+        }
 
         .playlist-card {
           position: relative;
@@ -52,6 +64,9 @@ class PlaylistsPage extends PolymerElement {
           grid-template-rows: 1fr 1fr;
           align-items: center;
         }
+        .playlist-card-content.all-tracks {
+          grid-template-rows: 1fr;
+        }
         .playlist-title,
         .playlist-author {
           white-space: nowrap;
@@ -72,6 +87,34 @@ class PlaylistsPage extends PolymerElement {
       </style>
 
       <div class="content-grid">
+        <!-- <div
+          data-action="open"
+          data-playlist="all"
+          class="card playlist-card"
+          on-click="_playlistClick"
+        >
+          <div
+            data-action="open"
+            data-playlist="all"
+            class="playlist-length"
+          >
+            [[tracks.length]]
+          </div>
+          <div
+            data-action="open"
+            data-playlist="all"
+            class="playlist-card-content all-tracks"
+          >
+            <p
+              data-action="open"
+              data-playlist="all"
+              class="playlist-title"
+            >
+              All Tracks
+            </p>
+          </div>
+          <paper-ripple></paper-ripple>
+        </div> -->
         <template is="dom-repeat" items="[[playlists]]" as="playlist">
           <div
             data-action="open"
@@ -133,6 +176,7 @@ class PlaylistsPage extends PolymerElement {
         type: Boolean,
         observer: "_activeChanged"
       },
+      tracks: Array,
       playlists: Array
     };
   }
@@ -165,7 +209,7 @@ class PlaylistsPage extends PolymerElement {
         let playlist = this.playlists.find(item => {
           return item.id === Number(e.target.dataset.playlist);
         });
-        console.log(playlist);
+        console.log(`Playlist: ${playlist.title} - ${playlist.author}`);
         break;
     }
   }

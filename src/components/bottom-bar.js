@@ -68,6 +68,19 @@ class BottomBar extends PolymerElement {
           grid-template-rows: 2px 1fr;
           transition: height 0.2s ease-in-out;
         }
+
+        @media screen and (min-width: 640px) {
+          .bottom-bar {
+            width: 640px;
+            padding-left: calc(50vw - 320px);
+            padding-right: calc(50vw - 320px);
+          }
+          .active-track-content {
+            padding-left: calc(50vw - 320px);
+            padding-right: calc(50vw - 320px);
+          }
+        }
+
         .active-track-bar.active {
           height: 48px;
         }
@@ -121,7 +134,7 @@ class BottomBar extends PolymerElement {
       </style>
       <div
         data-action="player"
-        class$="active-track-bar[[_showActive(page)]]"
+        class$="active-track-bar[[_showActive(page, player.track)]]"
         on-click="_activeTrackClick"
       >
         <div data-data-action="player" class="progress-bar">
@@ -135,8 +148,9 @@ class BottomBar extends PolymerElement {
           <img
             data-action="player"
             class="active-track-disc"
-            src="[[player.track.art]]"
+            src="[[_getCoverArt(player.track.art)]]"
           />
+          </template>
           <div data-action="player" class="active-track-info">
             <p data-action="player" class="active-track-title">
               [[player.track.title]]
@@ -197,17 +211,21 @@ class BottomBar extends PolymerElement {
     return page === activePage ? " active" : "";
   }
 
-  _showActive(page) {
+  _showActive(page, activeTrack) {
     let pages = ["home", "playlists", "playlist"];
-    return pages.includes(page) ? " active" : "";
+    return pages.includes(page) && activeTrack ? " active" : "";
   }
 
   _getProgress(time, total) {
-    return (time * 100) / total;
+    return (time * 100) / total || 0;
   }
 
   _getIcon(playing) {
     return playing ? "pause" : "play";
+  }
+
+  _getCoverArt(coverArt) {
+    return coverArt || "../../assets/images/icons/default_cover_art.svg";
   }
 
   _active(active) {

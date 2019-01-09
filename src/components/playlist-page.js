@@ -3,7 +3,7 @@ import "@polymer/polymer/lib/elements/dom-repeat.js";
 import "@polymer/app-route/app-route.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "../../assets/images/icons/icon-set.js";
-import "./shared-styles.js";
+import "../style/shared-styles.js";
 
 class PlaylistPage extends PolymerElement {
   static get template() {
@@ -108,7 +108,7 @@ class PlaylistPage extends PolymerElement {
       </app-route>
 
       <div class="playlist-content">
-        <p class="title">[[playlist.title]]</p>
+        <p class="title">[[playlist.name]]</p>
         <p class="subtitle">by [[playlist.author]]</p>
         <div class="playlist-play">PLAY<paper-ripple></paper-ripple></div>
       </div>

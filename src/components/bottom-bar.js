@@ -1,7 +1,7 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "../../assets/images/icons/icon-set.js";
-import "./shared-styles.js";
+import "../style/shared-styles.js";
 
 class BottomBar extends PolymerElement {
   static get template() {
@@ -141,7 +141,7 @@ class BottomBar extends PolymerElement {
           <div
             data-action="player"
             class$="progress[[_active(player.state.playing)]]"
-            style$="width: [[_getProgress(player.state.time, player.track.time)]]%;"
+            style$="width: [[_getProgress(player.state.time, player.track.duration)]]%;"
           ></div>
         </div>
         <div data-action="player" class="active-track-content">

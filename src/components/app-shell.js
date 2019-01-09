@@ -10,6 +10,8 @@ import "@polymer/app-route/app-location.js";
 import "@polymer/app-route/app-route.js";
 import "@polymer/iron-pages/iron-pages.js";
 import "./bottom-bar.js";
+import "../api/repository-tracks.js";
+import "../api/repository-playlists.js";
 
 class AppShell extends PolymerElement {
   static get template() {
@@ -33,7 +35,8 @@ class AppShell extends PolymerElement {
           opacity: 0;
         }
       </style>
-
+      <repository-tracks id="repositoryTracks"></repository-tracks>
+      <repository-playlists id="repositoryPlaylists"></repository-playlists>
       <app-location route="{{route}}"></app-location>
       <app-route
         route="{{route}}"
@@ -118,7 +121,7 @@ class AppShell extends PolymerElement {
             title: "Sick Boy",
             art: "https://msprojectsound.com/images/153790132747790588.jpg",
             artist: "The Chainsmokers",
-            time: 193
+            duration: 193
           },
           {
             id: 2,
@@ -126,7 +129,7 @@ class AppShell extends PolymerElement {
             art:
               "https://images-na.ssl-images-amazon.com/images/I/51ukIAM3foL._SS500.jpg",
             artist: "The Chainsmokers",
-            time: 224
+            duration: 224
           }
         ]
       },
@@ -135,7 +138,7 @@ class AppShell extends PolymerElement {
         value: [
           {
             id: 1,
-            title: "Hollandse Hits",
+            name: "Hollandse Hits",
             author: "Daan Botter",
             isYours: false,
             tracks: [
@@ -144,7 +147,7 @@ class AppShell extends PolymerElement {
                 title: "Sick Boy",
                 art: "https://msprojectsound.com/images/153790132747790588.jpg",
                 artist: "The Chainsmokers",
-                time: 193
+                duration: 193
               },
               {
                 id: 2,
@@ -152,13 +155,13 @@ class AppShell extends PolymerElement {
                 art:
                   "https://images-na.ssl-images-amazon.com/images/I/51ukIAM3foL._SS500.jpg",
                 artist: "The Chainsmokers",
-                time: 224
+                duration: 224
               }
             ]
           },
           {
             id: 2,
-            title: "Chill Hits",
+            name: "Chill Hits",
             author: "Thomas Stoevelaar",
             isYours: true,
             tracks: [
@@ -168,7 +171,7 @@ class AppShell extends PolymerElement {
                 art:
                   "https://images-na.ssl-images-amazon.com/images/I/51ukIAM3foL._SS500.jpg",
                 artist: "The Chainsmokers",
-                time: 224
+                duration: 224
               }
             ]
           }
@@ -202,6 +205,24 @@ class AppShell extends PolymerElement {
       this._timer(this.player);
     }, 1000);
 
+    this.$.repositoryTracks
+      .getTracks()
+      .then(result => {
+        this.set("tracks", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    this.$.repositoryPlaylists
+      .getPlaylists()
+      .then(result => {
+        this.set("playlists", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
     window.addEventListener("set-path", e =>
       this._setPath(e.detail.path, e.detail.history)
     );
@@ -214,11 +235,11 @@ class AppShell extends PolymerElement {
   }
 
   _timer(player) {
-    if (player.state.playing && player.state.time < player.track.time) {
+    if (player.state.playing && player.state.time < player.track.duration) {
       this.set("player.state.time", player.state.time + 1);
     } else if (
       player.state.playing &&
-      player.state.time === player.track.time
+      player.state.time === player.track.duration
     ) {
       this.set("player.state.playing", false);
       this.set("player.track", null);
@@ -280,7 +301,7 @@ class AppShell extends PolymerElement {
   _toggleState(state, value) {
     if (
       state === "playing" &&
-      this.player.state.time === this.player.track.time
+      this.player.state.time === this.player.track.duration
     ) {
       this.set("player.state.time", 0);
     }

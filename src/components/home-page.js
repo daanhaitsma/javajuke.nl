@@ -2,7 +2,7 @@ import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/polymer/lib/elements/dom-repeat.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "../../assets/images/icons/icon-set.js";
-import "./shared-styles.js";
+import "../style/shared-styles.js";
 
 class HomePage extends PolymerElement {
   static get template() {
@@ -90,7 +90,7 @@ class HomePage extends PolymerElement {
               data-action="play"
               data-track$="[[track.id]]"
               class="track-card-disc"
-              src="[[track.art]]"
+              src="[[_getCoverArt(track.art)]]"
               alt=""
             />
             <div
@@ -151,6 +151,10 @@ class HomePage extends PolymerElement {
 
   _active(track, activeTrack) {
     return track === activeTrack ? " active" : "";
+  }
+
+  _getCoverArt(coverArt) {
+    return coverArt || "../../assets/images/icons/default_cover_art.svg";
   }
 
   _onDown(e) {

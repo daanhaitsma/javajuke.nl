@@ -3,7 +3,7 @@ import "@polymer/polymer/lib/elements/dom-repeat.js";
 import "@polymer/polymer/lib/elements/dom-if.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "../../assets/images/icons/icon-set.js";
-import "./shared-styles.js";
+import "../style/shared-styles.js";
 
 class PlaylistsPage extends PolymerElement {
   static get template() {
@@ -139,7 +139,7 @@ class PlaylistsPage extends PolymerElement {
                 data-playlist$="[[playlist.id]]"
                 class="playlist-title"
               >
-                [[playlist.title]]
+                [[playlist.name]]
               </p>
               <p
                 data-action="open"
@@ -209,7 +209,7 @@ class PlaylistsPage extends PolymerElement {
         let playlist = this.playlists.find(item => {
           return item.id === Number(e.target.dataset.playlist);
         });
-        console.log(`Playlist: ${playlist.title} - ${playlist.author}`);
+        console.log(`Playlist: ${playlist.name} - ${playlist.author}`);
         break;
     }
   }

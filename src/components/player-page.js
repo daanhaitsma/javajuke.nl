@@ -1,7 +1,7 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "../../assets/images/icons/icon-set.js";
-import "./shared-styles.js";
+import "../style/shared-styles.js";
 
 class PlayerPage extends PolymerElement {
   static get template() {
@@ -100,11 +100,11 @@ class PlayerPage extends PolymerElement {
               <div class="progress-bar">
                 <div
                   class$="progress[[_active(player.state.playing)]]"
-                  style$="width: [[_getProgress(player.state.time, player.track.time)]]%;"
+                  style$="width: [[_getProgress(player.state.time, player.track.duration)]]%;"
                 ></div>
               </div>
             </div>
-            <div class="time">[[_convertTime(player.track.time)]]</div>
+            <div class="time">[[_convertTime(player.track.duration)]]</div>
           </div>
           <div class="controls">
             <div
@@ -237,7 +237,7 @@ class PlayerPage extends PolymerElement {
     window.dispatchEvent(
       new CustomEvent("set-time", {
         detail: {
-          time: Math.round(this.player.track.time * percentage)
+          time: Math.round(this.player.track.duration * percentage)
         }
       })
     );

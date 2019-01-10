@@ -109,7 +109,7 @@ class PlaylistPage extends PolymerElement {
 
       <div class="playlist-content">
         <p class="title">[[playlist.name]]</p>
-        <p class="subtitle">by [[playlist.author]]</p>
+        <p class="subtitle">by [[playlist.user.username]]</p>
         <div class="playlist-play">PLAY<paper-ripple></paper-ripple></div>
       </div>
       <div class="content-grid">
@@ -124,7 +124,7 @@ class PlaylistPage extends PolymerElement {
               data-action="play"
               data-track$="[[track.id]]"
               class="track-card-disc"
-              src="[[track.art]]"
+              src="[[_getCoverArt(track.art)]]"
               alt=""
             />
             <div
@@ -204,6 +204,10 @@ class PlaylistPage extends PolymerElement {
 
   _active(track, activeTrack) {
     return track === activeTrack ? " active" : "";
+  }
+
+  _getCoverArt(coverArt) {
+    return coverArt || "../../assets/images/icons/default_cover_art.svg";
   }
 
   _onDown(e) {

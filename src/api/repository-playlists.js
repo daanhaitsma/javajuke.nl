@@ -1,13 +1,25 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/iron-ajax/iron-ajax.js";
-import * as apiConfig from "../utils/apiConfig.js";
+import * as apiHelper from "../utils/apiHelper.js";
 
 class RepositoryPlaylists extends PolymerElement {
   static get template() {
     return html`
-      <iron-ajax id="getPlaylists" url="[[getPlaylistsUrl]]" handle-as="json">
+      <iron-ajax
+        id="getPlaylists"
+        method="GET"
+        url="[[getPlaylistsUrl]]"
+        headers="[[headers]]"
+        handle-as="json"
+      >
       </iron-ajax>
-      <iron-ajax id="getPlaylist" url="[[getPlaylistUrl]]" handle-as="json">
+      <iron-ajax
+        id="getPlaylist"
+        method="GET"
+        url="[[getPlaylistUrl]]"
+        headers="[[headers]]"
+        handle-as="json"
+      >
       </iron-ajax>
     `;
   }
@@ -15,13 +27,18 @@ class RepositoryPlaylists extends PolymerElement {
     return {
       getPlaylistsUrl: {
         type: String,
-        value: apiConfig.getPlaylistsUrl()
+        value: apiHelper.getPlaylistsUrl()
       },
-      getPlaylistUrl: String
+      getPlaylistUrl: String,
+      headers: {
+        type: Object,
+        value: apiHelper.getApiHeaders()
+      }
     };
   }
   getPlaylists() {
     return new Promise((resolve, reject) => {
+      this.set("headers", apiHelper.getApiHeaders());
       this.$.getPlaylists
         .generateRequest()
         .completes.then(request => {
@@ -35,7 +52,8 @@ class RepositoryPlaylists extends PolymerElement {
   }
   getPlaylist(id) {
     return new Promise((resolve, reject) => {
-      this.set("getPlaylistUrl", apiConfig.getPlaylistUrl(id));
+      this.set("headers", apiHelper.getApiHeaders());
+      this.set("getPlaylistUrl", apiHelper.getPlaylistUrl(id));
       this.$.getPlaylist
         .generateRequest()
         .completes.then(request => {

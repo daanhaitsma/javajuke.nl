@@ -146,7 +146,7 @@ class PlaylistsPage extends PolymerElement {
                 data-playlist$="[[playlist.id]]"
                 class="playlist-author"
               >
-                by [[playlist.author]]
+                by [[playlist.user.username]]
               </p>
             </div>
             <template is="dom-if" if="[[playlist.isYours]]">
@@ -209,7 +209,7 @@ class PlaylistsPage extends PolymerElement {
         let playlist = this.playlists.find(item => {
           return item.id === Number(e.target.dataset.playlist);
         });
-        console.log(`Playlist: ${playlist.name} - ${playlist.author}`);
+        console.log(`Playlist: ${playlist.name} - ${playlist.user.username}`);
         break;
     }
   }

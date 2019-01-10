@@ -1,4 +1,5 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
+import "@polymer/polymer/lib/elements/dom-if.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "../../assets/images/icons/icon-set.js";
 import "../style/shared-styles.js";
@@ -132,72 +133,74 @@ class BottomBar extends PolymerElement {
           text-overflow: ellipsis;
         }
       </style>
-      <div
-        data-action="player"
-        class$="active-track-bar[[_showActive(page, player.track)]]"
-        on-click="_activeTrackClick"
-      >
-        <div data-data-action="player" class="progress-bar">
-          <div
-            data-action="player"
-            class$="progress[[_active(player.state.playing)]]"
-            style$="width: [[_getProgress(player.state.time, player.track.duration)]]%;"
-          ></div>
-        </div>
-        <div data-action="player" class="active-track-content">
-          <img
-            data-action="player"
-            class="active-track-disc"
-            src="[[_getCoverArt(player.track.art)]]"
-          />
-          </template>
-          <div data-action="player" class="active-track-info">
-            <p data-action="player" class="active-track-title">
-              [[player.track.title]]
-            </p>
-            <p data-action="player" class="active-track-artist">
-              [[player.track.artist]]
-            </p>
-          </div>
-          <div data-action="playPause" class="icon-button" on-down="_onDown">
-            <iron-icon
-              data-action="playPause"
-              icon$="[[_getIcon(player.state.playing)]]"
-            ></iron-icon>
-            <paper-ripple center></paper-ripple>
-          </div>
-        </div>
-        <paper-ripple></paper-ripple>
-      </div>
 
-      <div class="bottom-bar">
+      <template is="dom-if" if="[[_showBar(page)]]">
         <div
-          class$="bottom-bar-button[[_activePage('home', page)]]"
-          on-click="_home"
+          data-action="player"
+          class$="active-track-bar[[_showActive(page, player.track)]]"
+          on-click="_activeTrackClick"
         >
-          <iron-icon icon="home"></iron-icon>
-          <p class="bottom-bar-title">Home</p>
-          <paper-ripple class="ripple" center></paper-ripple>
+          <div data-data-action="player" class="progress-bar">
+            <div
+              data-action="player"
+              class$="progress[[_active(player.state.playing)]]"
+              style$="width: [[_getProgress(player.state.time, player.track.duration)]]%;"
+            ></div>
+          </div>
+          <div data-action="player" class="active-track-content">
+            <img
+              data-action="player"
+              class="active-track-disc"
+              src="[[_getCoverArt(player.track.art)]]"
+            />
+            <div data-action="player" class="active-track-info">
+              <p data-action="player" class="active-track-title">
+                [[player.track.title]]
+              </p>
+              <p data-action="player" class="active-track-artist">
+                [[player.track.artist]]
+              </p>
+            </div>
+            <div data-action="playPause" class="icon-button" on-down="_onDown">
+              <iron-icon
+                data-action="playPause"
+                icon$="[[_getIcon(player.state.playing)]]"
+              ></iron-icon>
+              <paper-ripple center></paper-ripple>
+            </div>
+          </div>
+          <paper-ripple></paper-ripple>
         </div>
-        <div
-          class$="bottom-bar-button[[_activePage('playlists', page)]]"
-          data-path="/playlists"
-          on-click="_navigate"
-        >
-          <iron-icon data-path="/playlists" icon="folder"></iron-icon>
-          <p data-path="/playlists" class="bottom-bar-title">Playlists</p>
-          <paper-ripple
+
+        <div class="bottom-bar">
+          <div
+            class$="bottom-bar-button[[_activePage('home', page)]]"
+            on-click="_home"
+          >
+            <iron-icon icon="home"></iron-icon>
+            <p class="bottom-bar-title">Home</p>
+            <paper-ripple class="ripple" center></paper-ripple>
+          </div>
+          <div
+            class$="bottom-bar-button[[_activePage('playlists', page)]]"
             data-path="/playlists"
-            class="ripple"
-            center
-          ></paper-ripple>
+            on-click="_navigate"
+          >
+            <iron-icon data-path="/playlists" icon="folder"></iron-icon>
+            <p data-path="/playlists" class="bottom-bar-title">Playlists</p>
+            <paper-ripple
+              data-path="/playlists"
+              class="ripple"
+              center
+            ></paper-ripple>
+          </div>
+          <div class$="bottom-bar-button[[_activePage('account, page')]]">
+            <iron-icon icon="account"></iron-icon>
+            <p class="bottom-bar-title">Account</p>
+            <paper-ripple class="ripple" center></paper-ripple>
+          </div>
         </div>
-        <div class$="bottom-bar-button[[_activePage('account, page')]]">
-          <iron-icon icon="account"></iron-icon>
-          <p class="bottom-bar-title">Account</p>
-          <paper-ripple class="ripple" center></paper-ripple>
-        </div>
-      </div>
+      </template>
     `;
   }
   static get properties() {
@@ -214,6 +217,10 @@ class BottomBar extends PolymerElement {
   _showActive(page, activeTrack) {
     let pages = ["home", "playlists", "playlist"];
     return pages.includes(page) && activeTrack ? " active" : "";
+  }
+
+  _showBar(page) {
+    return page !== "login";
   }
 
   _getProgress(time, total) {

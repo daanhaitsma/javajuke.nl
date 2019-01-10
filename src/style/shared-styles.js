@@ -15,6 +15,12 @@ $_documentContainer.innerHTML = `
           margin: 0;
         }
 
+        paper-input {
+          --paper-input-container-color: #757575;
+          --paper-input-container-focus-color: var(--active-color);
+          --paper-input-container-input-color: #757575;
+        }
+
         p.title {
           font-size: 32px;
           font-weight: 600;

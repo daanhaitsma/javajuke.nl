@@ -1,13 +1,25 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/iron-ajax/iron-ajax.js";
-import * as apiConfig from "../utils/apiConfig.js";
+import * as apiHelper from "../utils/apiHelper.js";
 
 class RepositoryTracks extends PolymerElement {
   static get template() {
     return html`
-      <iron-ajax id="getTracks" url="[[getTracksUrl]]" handle-as="json">
+      <iron-ajax
+        id="getTracks"
+        method="GET"
+        url="[[getTracksUrl]]"
+        headers="[[headers]]"
+        handle-as="json"
+      >
       </iron-ajax>
-      <iron-ajax id="getTrack" url="[[getTrackUrl]]" handle-as="json">
+      <iron-ajax
+        id="getTrack"
+        method="GET"
+        url="[[getTrackUrl]]"
+        headers="[[headers]]"
+        handle-as="json"
+      >
       </iron-ajax>
     `;
   }
@@ -15,13 +27,18 @@ class RepositoryTracks extends PolymerElement {
     return {
       getTracksUrl: {
         type: String,
-        value: apiConfig.getTracksUrl()
+        value: apiHelper.getTracksUrl()
       },
-      getTrackUrl: String
+      getTrackUrl: String,
+      headers: {
+        type: Object,
+        value: apiHelper.getApiHeaders()
+      }
     };
   }
   getTracks() {
     return new Promise((resolve, reject) => {
+      this.set("headers", apiHelper.getApiHeaders());
       this.$.getTracks
         .generateRequest()
         .completes.then(request => {
@@ -35,7 +52,8 @@ class RepositoryTracks extends PolymerElement {
   }
   getTrack(id) {
     return new Promise((resolve, reject) => {
-      this.set("getTrackUrl", apiConfig.getTrackUrl(id));
+      this.set("headers", apiHelper.getApiHeaders());
+      this.set("getTrackUrl", apiHelper.getTrackUrl(id));
       this.$.getTrack
         .generateRequest()
         .completes.then(request => {

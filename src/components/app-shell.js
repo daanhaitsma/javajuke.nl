@@ -5,11 +5,13 @@ import {
 } from "@polymer/polymer/lib/utils/settings.js";
 import { vhCheck } from "../utils/viewportHeightCheck.js";
 import { addOfflineListener } from "../utils/offlineListener.js";
+import * as cookieHelper from "../utils/cookieHelper.js";
 // import "@polymer/polymer/lib/elements/dom-if.js";
 import "@polymer/app-route/app-location.js";
 import "@polymer/app-route/app-route.js";
 import "@polymer/iron-pages/iron-pages.js";
 import "./bottom-bar.js";
+import "../api/repository-auth.js";
 import "../api/repository-tracks.js";
 import "../api/repository-playlists.js";
 
@@ -35,6 +37,7 @@ class AppShell extends PolymerElement {
           opacity: 0;
         }
       </style>
+      <repository-auth id="repositoryAuth"></repository-auth>
       <repository-tracks id="repositoryTracks"></repository-tracks>
       <repository-playlists id="repositoryPlaylists"></repository-playlists>
       <app-location route="{{route}}"></app-location>
@@ -78,6 +81,10 @@ class AppShell extends PolymerElement {
             route="[[subroute]]"
             active="[[_isActive(page, 'playlist')]]"
           ></playlist-page>
+          <login-page
+            name="login"
+            active="[[_isActive(page, 'login')]]"
+          ></login-page>
           <div name="404">404</div>
         </iron-pages>
         <bottom-bar page="[[routeData.page]]" player="[[player]]"></bottom-bar>
@@ -113,70 +120,9 @@ class AppShell extends PolymerElement {
           }
         }
       },
-      tracks: {
-        type: Array,
-        value: [
-          {
-            id: 1,
-            title: "Sick Boy",
-            art: "https://msprojectsound.com/images/153790132747790588.jpg",
-            artist: "The Chainsmokers",
-            duration: 193
-          },
-          {
-            id: 2,
-            title: "Everybody Hates Me",
-            art:
-              "https://images-na.ssl-images-amazon.com/images/I/51ukIAM3foL._SS500.jpg",
-            artist: "The Chainsmokers",
-            duration: 224
-          }
-        ]
-      },
-      playlists: {
-        type: Array,
-        value: [
-          {
-            id: 1,
-            name: "Hollandse Hits",
-            author: "Daan Botter",
-            isYours: false,
-            tracks: [
-              {
-                id: 1,
-                title: "Sick Boy",
-                art: "https://msprojectsound.com/images/153790132747790588.jpg",
-                artist: "The Chainsmokers",
-                duration: 193
-              },
-              {
-                id: 2,
-                title: "Everybody Hates Me",
-                art:
-                  "https://images-na.ssl-images-amazon.com/images/I/51ukIAM3foL._SS500.jpg",
-                artist: "The Chainsmokers",
-                duration: 224
-              }
-            ]
-          },
-          {
-            id: 2,
-            name: "Chill Hits",
-            author: "Thomas Stoevelaar",
-            isYours: true,
-            tracks: [
-              {
-                id: 2,
-                title: "Everybody Hates Me",
-                art:
-                  "https://images-na.ssl-images-amazon.com/images/I/51ukIAM3foL._SS500.jpg",
-                artist: "The Chainsmokers",
-                duration: 224
-              }
-            ]
-          }
-        ]
-      }
+      tracks: Array,
+      playlists: Array,
+      user: Object
     };
   }
 
@@ -194,6 +140,7 @@ class AppShell extends PolymerElement {
     super.ready();
 
     this._setupHistory();
+    this._checkAuth();
 
     vhCheck();
 
@@ -205,24 +152,6 @@ class AppShell extends PolymerElement {
       this._timer(this.player);
     }, 1000);
 
-    this.$.repositoryTracks
-      .getTracks()
-      .then(result => {
-        this.set("tracks", result);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-
-    this.$.repositoryPlaylists
-      .getPlaylists()
-      .then(result => {
-        this.set("playlists", result);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-
     window.addEventListener("set-path", e =>
       this._setPath(e.detail.path, e.detail.history)
     );
@@ -231,6 +160,9 @@ class AppShell extends PolymerElement {
     window.addEventListener("set-time", e => this._setTime(e.detail.time));
     window.addEventListener("toggle-state", e =>
       this._toggleState(e.detail.state, e.detail.value)
+    );
+    window.addEventListener("login-user", e =>
+      this._login(e.detail.username, e.detail.password)
     );
   }
 
@@ -261,6 +193,9 @@ class AppShell extends PolymerElement {
         break;
       case "playlist":
         import("./playlist-page.js");
+        break;
+      case "login":
+        import("./login-page.js");
         break;
       case "404":
         // import("./404-page.js");
@@ -308,13 +243,70 @@ class AppShell extends PolymerElement {
     this.set(`player.state.${state}`, value);
   }
 
+  _login(username, password) {
+    this.$.repositoryAuth
+      .login("", username, password)
+      .then(result => {
+        cookieHelper.setCookie("auth_token", result.token, 1440);
+        this.set("user", result);
+        this._setPath("/home", []);
+        this._getData();
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _getData() {
+    this.$.repositoryTracks
+      .getTracks()
+      .then(result => {
+        this.set("tracks", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    this.$.repositoryPlaylists
+      .getPlaylists()
+      .then(result => {
+        this.set("playlists", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _checkAuth() {
+    if (cookieHelper.getCookie("auth_token")) {
+      this.$.repositoryAuth
+        .getUser()
+        .then(result => {
+          this.set("user", result);
+          this._getData();
+          this._setPath("/home", []);
+        })
+        .catch(error => {
+          console.log(error);
+          cookieHelper.removeCookie("auth_token");
+          this._setPath("/login", []);
+        });
+    } else {
+      this._setPath("/login", []);
+    }
+  }
+
   _isActive(activePage, page) {
     return activePage === page;
   }
 
   _setupHistory() {
     if (window.history.state === null) {
-      window.history.pushState({ history: [] }, "", "/home");
+      if (cookieHelper.getCookie("auth_token")) {
+        window.history.pushState({ history: [] }, "", "/home");
+      } else {
+        window.history.pushState({ history: [] }, "", "/login");
+      }
       window.dispatchEvent(new CustomEvent("location-changed"));
     } else {
       this.set("history", window.history.state.history);

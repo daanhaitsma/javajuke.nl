@@ -14,6 +14,7 @@ import "./bottom-bar.js";
 import "../api/repository-auth.js";
 import "../api/repository-tracks.js";
 import "../api/repository-playlists.js";
+import "../api/repository-player.js";
 
 class AppShell extends PolymerElement {
   static get template() {
@@ -40,6 +41,7 @@ class AppShell extends PolymerElement {
       <repository-auth id="repositoryAuth"></repository-auth>
       <repository-tracks id="repositoryTracks"></repository-tracks>
       <repository-playlists id="repositoryPlaylists"></repository-playlists>
+      <repository-player id="repositoryPlayer"></repository-player>
       <app-location route="{{route}}"></app-location>
       <app-route
         route="{{route}}"
@@ -72,6 +74,7 @@ class AppShell extends PolymerElement {
             name="playlists"
             tracks="[[tracks]]"
             playlists="[[playlists]]"
+            user="[[user]]"
             active="[[_isActive(page, 'playlists')]]"
           ></playlists-page>
           <playlist-page
@@ -115,19 +118,24 @@ class AppShell extends PolymerElement {
           state: {
             playing: false,
             shuffle: false,
-            loop: false,
+            repeat: false,
             time: 0
           }
         }
       },
       tracks: Array,
       playlists: Array,
-      user: Object
+      user: Object,
+      playerInterval: Object,
+      stateInterval: Object
     };
   }
 
   static get observers() {
-    return ["_routePageChanged(routeData.page)"];
+    return [
+      "_routePageChanged(routeData.page)",
+      "_playingChanged(player.state.playing)"
+    ];
   }
 
   constructor() {
@@ -140,7 +148,8 @@ class AppShell extends PolymerElement {
     super.ready();
 
     this._setupHistory();
-    this._checkAuth();
+    // this._checkAuth();
+    this._getData();
 
     vhCheck();
 
@@ -148,34 +157,47 @@ class AppShell extends PolymerElement {
       this.set("offline", offline);
     });
 
-    setInterval(() => {
-      this._timer(this.player);
-    }, 1000);
+    this.set(
+      "stateInterval",
+      setInterval(() => {
+        this._getState();
+      }, 2000)
+    );
 
     window.addEventListener("set-path", e =>
       this._setPath(e.detail.path, e.detail.history)
     );
 
     window.addEventListener("set-track", e => this._setTrack(e.detail.track));
-    window.addEventListener("set-time", e => this._setTime(e.detail.time));
+    window.addEventListener("play-playlist", e =>
+      this._playPlaylist(e.detail.playlist)
+    );
+    window.addEventListener("next-track", e => this._nextTrack());
+    window.addEventListener("previous-track", e => this._previousTrack());
     window.addEventListener("toggle-state", e =>
-      this._toggleState(e.detail.state, e.detail.value)
+      this._toggleState(e.detail.state)
     );
     window.addEventListener("login-user", e =>
       this._login(e.detail.username, e.detail.password)
     );
   }
 
-  _timer(player) {
-    if (player.state.playing && player.state.time < player.track.duration) {
-      this.set("player.state.time", player.state.time + 1);
-    } else if (
-      player.state.playing &&
-      player.state.time === player.track.duration
-    ) {
-      this.set("player.state.playing", false);
-      this.set("player.track", null);
+  _playingChanged(playing) {
+    if (playing) {
+      clearInterval(this.playerInterval);
+      this.set(
+        "playerInterval",
+        setInterval(() => {
+          this._timer(this.player);
+        }, 1000)
+      );
+    } else {
+      clearInterval(this.playerInterval);
     }
+  }
+
+  _timer(player) {
+    this.set("player.state.position", player.state.position + 1);
   }
 
   _routePageChanged(page) {
@@ -225,22 +247,50 @@ class AppShell extends PolymerElement {
 
   _setTrack(track) {
     this.set("player.track", track);
-    this.set("player.state.playing", true);
-    this.set("player.state.time", 0);
   }
 
-  _setTime(time) {
-    this.set("player.state.time", time);
+  _getState() {
+    this.$.repositoryPlayer.getState().then(result => {
+      this.set("player.state", result);
+    });
   }
 
-  _toggleState(state, value) {
-    if (
-      state === "playing" &&
-      this.player.state.time === this.player.track.duration
-    ) {
-      this.set("player.state.time", 0);
+  _toggleState(state) {
+    switch (state) {
+      case "playing":
+        this.$.repositoryPlayer.togglePlay().then(result => {
+          this.set("player.state", result);
+        });
+        break;
+      case "shuffle":
+        this.$.repositoryPlayer.toggleShuffle().then(result => {
+          this.set("player.state", result);
+        });
+        break;
+      case "repeat":
+        this.$.repositoryPlayer.toggleRepeat().then(result => {
+          this.set("player.state", result);
+        });
+        break;
     }
-    this.set(`player.state.${state}`, value);
+  }
+
+  _previousTrack() {
+    this.$.repositoryPlayer.previousTrack().then(result => {
+      this.set("player.state", result);
+    });
+  }
+
+  _nextTrack() {
+    this.$.repositoryPlayer.nextTrack().then(result => {
+      this.set("player.state", result);
+    });
+  }
+
+  _playPlaylist(playlist) {
+    this.$.repositoryPlayer.playPlaylist(playlist).then(result => {
+      this.set("player.state", result);
+    });
   }
 
   _login(username, password) {
@@ -302,11 +352,11 @@ class AppShell extends PolymerElement {
 
   _setupHistory() {
     if (window.history.state === null) {
-      if (cookieHelper.getCookie("auth_token")) {
-        window.history.pushState({ history: [] }, "", "/home");
-      } else {
-        window.history.pushState({ history: [] }, "", "/login");
-      }
+      // if (cookieHelper.getCookie("auth_token")) {
+      window.history.pushState({ history: [] }, "", "/home");
+      // } else {
+      //   window.history.pushState({ history: [] }, "", "/login");
+      // }
       window.dispatchEvent(new CustomEvent("location-changed"));
     } else {
       this.set("history", window.history.state.history);

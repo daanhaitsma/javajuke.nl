@@ -144,7 +144,7 @@ class BottomBar extends PolymerElement {
             <div
               data-action="player"
               class$="progress[[_active(player.state.playing)]]"
-              style$="width: [[_getProgress(player.state.time, player.track.duration)]]%;"
+              style$="width: [[_getProgress(player.state.position, player.track.duration)]]%;"
             ></div>
           </div>
           <div data-action="player" class="active-track-content">
@@ -161,13 +161,13 @@ class BottomBar extends PolymerElement {
                 [[player.track.artist]]
               </p>
             </div>
-            <div data-action="playPause" class="icon-button" on-down="_onDown">
+            <button data-action="playPause" class="icon-button" on-down="_onDown">
               <iron-icon
                 data-action="playPause"
-                icon$="[[_getIcon(player.state.playing)]]"
+                icon$="[[_getIcon(player.state.paused)]]"
               ></iron-icon>
               <paper-ripple center></paper-ripple>
-            </div>
+            </button>
           </div>
           <paper-ripple></paper-ripple>
         </div>
@@ -227,8 +227,8 @@ class BottomBar extends PolymerElement {
     return (time * 100) / total || 0;
   }
 
-  _getIcon(playing) {
-    return playing ? "pause" : "play";
+  _getIcon(paused) {
+    return paused ? "play" : "pause";
   }
 
   _getCoverArt(coverArt) {
@@ -270,7 +270,7 @@ class BottomBar extends PolymerElement {
       case "playPause":
         window.dispatchEvent(
           new CustomEvent("toggle-state", {
-            detail: { state: "playing", value: !this.player.state.playing }
+            detail: { state: "playing" }
           })
         );
     }

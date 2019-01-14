@@ -93,21 +93,21 @@ class PlayerPage extends PolymerElement {
           <p class="title">[[player.track.title]]</p>
           <p class="subtitle">[[player.track.artist]]</p>
           <div class="progress-container">
-            <div class="time" on-click="_restart">
-              [[_convertTime(player.state.time)]]
+            <div class="time">
+              [[_convertTime(player.state.position)]]
             </div>
-            <div id="progress" class="progress-bar-container" on-click="_click">
+            <div id="progress" class="progress-bar-container">
               <div class="progress-bar">
                 <div
                   class$="progress[[_active(player.state.playing)]]"
-                  style$="width: [[_getProgress(player.state.time, player.track.duration)]]%;"
+                  style$="width: [[_getProgress(player.state.position, player.track.duration)]]%;"
                 ></div>
               </div>
             </div>
             <div class="time">[[_convertTime(player.track.duration)]]</div>
           </div>
           <div class="controls">
-            <div
+            <button
               class$="icon-button[[_active(player.state.shuffle)]]"
               on-click="_shuffle"
             >
@@ -116,29 +116,29 @@ class PlayerPage extends PolymerElement {
                 class$="ripple[[_active(player.state.shuffle)]]"
                 center
               ></paper-ripple>
-            </div>
-            <div class="fab">
-              <iron-icon icon="skip-previous"></iron-icon>
+            </button>
+            <button class="fab" on-click="_previousTrack">
+              <iron-icon icon="previous-track"></iron-icon>
               <paper-ripple center></paper-ripple>
-            </div>
-            <div class="fab play" on-click="_playPause">
-              <iron-icon icon$="[[_getIcon(player.state.playing)]]"></iron-icon>
+            </button>
+            <button class="fab play" on-click="_playPause">
+              <iron-icon icon$="[[_getIcon(player.state.paused)]]"></iron-icon>
               <paper-ripple center></paper-ripple>
-            </div>
-            <div class="fab">
-              <iron-icon icon="skip-next"></iron-icon>
+            </button>
+            <button class="fab" on-click="_nextTrack">
+              <iron-icon icon="next-track"></iron-icon>
               <paper-ripple center></paper-ripple>
-            </div>
-            <div
-              class$="icon-button[[_active(player.state.loop)]]"
-              on-click="_loop"
+            </button>
+            <button
+              class$="icon-button[[_active(player.state.repeat)]]"
+              on-click="_repeat"
             >
               <iron-icon icon="repeat"></iron-icon>
               <paper-ripple
-                class$="ripple[[_active(player.state.loop)]]"
+                class$="ripple[[_active(player.state.repeat)]]"
                 center
               ></paper-ripple>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ class PlayerPage extends PolymerElement {
   }
 
   _trackChanged(track) {
-    if (!track) {
+    if (this.active && !track) {
       window.dispatchEvent(
         new CustomEvent("set-path", {
           detail: { path: "/home", history: [] }
@@ -194,51 +194,42 @@ class PlayerPage extends PolymerElement {
     return (time * 100) / total || 0;
   }
 
-  _getIcon(playing) {
-    return playing ? "pause" : "play";
+  _getIcon(paused) {
+    return paused ? "play" : "pause";
   }
 
   _getCoverArt(coverArt) {
     return coverArt || "../../assets/images/icons/default_cover_art.svg";
   }
 
-  _restart() {
-    window.dispatchEvent(new CustomEvent("set-time", { detail: { time: 0 } }));
-  }
-
   _shuffle() {
     window.dispatchEvent(
       new CustomEvent("toggle-state", {
-        detail: { state: "shuffle", value: !this.player.state.shuffle }
+        detail: { state: "shuffle" }
       })
     );
   }
 
-  _loop() {
+  _repeat() {
     window.dispatchEvent(
       new CustomEvent("toggle-state", {
-        detail: { state: "loop", value: !this.player.state.loop }
+        detail: { state: "repeat" }
       })
     );
+  }
+
+  _previousTrack() {
+    window.dispatchEvent(new CustomEvent("previous-track", { detail: {} }));
+  }
+
+  _nextTrack() {
+    window.dispatchEvent(new CustomEvent("next-track", { detail: {} }));
   }
 
   _playPause() {
     window.dispatchEvent(
       new CustomEvent("toggle-state", {
-        detail: { state: "playing", value: !this.player.state.playing }
-      })
-    );
-  }
-
-  _click(e) {
-    let position = e.clientX - this.$.progress.offsetLeft;
-    let total = this.$.progress.offsetWidth;
-    let percentage = position / total;
-    window.dispatchEvent(
-      new CustomEvent("set-time", {
-        detail: {
-          time: Math.round(this.player.track.duration * percentage)
-        }
+        detail: { state: "playing" }
       })
     );
   }

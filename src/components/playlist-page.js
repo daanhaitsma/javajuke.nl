@@ -17,7 +17,7 @@ class PlaylistPage extends PolymerElement {
 
         .playlist-play {
           position: relative;
-          margin: 16px auto 0px auto;
+          margin: 16px calc(50% - 64px) 0px calc(50% - 64px);
           width: 128px;
           height: 32px;
           line-height: 32px;
@@ -102,6 +102,12 @@ class PlaylistPage extends PolymerElement {
           align-self: center;
           justify-self: center;
         }
+        .card-modal {
+          width: calc(100% - 64px);
+          max-width: 328px;
+          max-height: calc(100% - 64px);
+          overflow-y: auto;
+        }
       </style>
 
       <app-route route="{{route}}" pattern="/:playlist" data="{{routeData}}">
@@ -110,7 +116,9 @@ class PlaylistPage extends PolymerElement {
       <div class="playlist-content">
         <p class="title">[[playlist.name]]</p>
         <p class="subtitle">by [[playlist.user.username]]</p>
-        <div class="playlist-play">PLAY<paper-ripple></paper-ripple></div>
+        <button class="playlist-play" on-click="_play">
+          PLAY<paper-ripple></paper-ripple>
+        </button>
       </div>
       <div class="content-grid">
         <template is="dom-repeat" items="[[playlist.tracks]]" as="track">
@@ -147,7 +155,7 @@ class PlaylistPage extends PolymerElement {
                 [[track.artist]]
               </p>
             </div>
-            <div
+            <button
               data-action="options"
               data-track$="[[track.id]]"
               class="icon-button"
@@ -159,11 +167,16 @@ class PlaylistPage extends PolymerElement {
                 icon="options"
               ></iron-icon>
               <paper-ripple center></paper-ripple>
-            </div>
+            </button>
             <paper-ripple></paper-ripple>
           </div>
         </template>
       </div>
+      <!-- <div class="overlay">
+        <div class="card card-modal">
+
+        </div>
+      </div> -->
     `;
   }
   static get properties() {
@@ -181,12 +194,12 @@ class PlaylistPage extends PolymerElement {
   }
 
   static get observers() {
-    return ["_playlistChanged(routeData.playlist)"];
+    return ["_playlistChanged(routeData.playlist, playlists)"];
   }
 
-  _playlistChanged(playlist) {
+  _playlistChanged(playlist, playlists) {
     playlist = Number(playlist);
-    if (playlist > 0) {
+    if (playlist > 0 && playlists) {
       this.set(
         "playlist",
         this.playlists.find(item => {
@@ -208,6 +221,16 @@ class PlaylistPage extends PolymerElement {
 
   _getCoverArt(coverArt) {
     return coverArt || "../../assets/images/icons/default_cover_art.svg";
+  }
+
+  _play() {
+    window.dispatchEvent(
+      new CustomEvent("play-playlist", {
+        detail: {
+          playlist: this.playlist.id
+        }
+      })
+    );
   }
 
   _onDown(e) {

@@ -33,3 +33,31 @@ export function getPlaylistsUrl() {
 export function getPlaylistUrl(id) {
   return `${apiBaseUrl}/playlists/${id}`;
 }
+
+export function getStateUrl() {
+  return `${apiBaseUrl}/playerstate`;
+}
+
+export function togglePlayUrl() {
+  return `${apiBaseUrl}/toggleplay`;
+}
+
+export function toggleShuffleUrl() {
+  return `${apiBaseUrl}/shuffle`;
+}
+
+export function toggleRepeatUrl() {
+  return `${apiBaseUrl}/repeat`;
+}
+
+export function nextTrackUrl() {
+  return `${apiBaseUrl}/nextsong`;
+}
+
+export function previousTrackUrl() {
+  return `${apiBaseUrl}/previoussong`;
+}
+
+export function playPlaylistUrl(id) {
+  return `${apiBaseUrl}/playlists/${id}/play`;
+}

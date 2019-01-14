@@ -11,8 +11,21 @@ $_documentContainer.innerHTML = `
           --active-color: #26A69A;
         }
 
+        *:focus {
+          outline: none;
+        }
+
         p {
           margin: 0;
+        }
+
+        button{
+          margin: 0;
+          padding: 0;
+          border: none;
+          font: inherit;
+          color: inherit;
+          background: none;
         }
 
         paper-input {
@@ -53,8 +66,6 @@ $_documentContainer.innerHTML = `
         .fab {
           position: relative;
           padding: 8px;
-          width: 24px;
-          height: 24px;
           color: #757575;
           border-radius: 50%;
           background-color: #fff;
@@ -69,8 +80,6 @@ $_documentContainer.innerHTML = `
         .icon-button {
           position: relative;
           padding: 8px;
-          width: 24px;
-          height: 24px;
           color: #757575;
           border-radius: 50%;
         }
@@ -90,6 +99,25 @@ $_documentContainer.innerHTML = `
         }
         .progress.active {
           background-color: var(--active-color);
+        }
+
+        .overlay {
+          position: fixed;
+          z-index: 5;
+          top: 0px;
+          right: 0px;
+          bottom: 0px;
+          left: 0px;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.4);
+        }
+
+        div.overlay > div.card {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
         }
       </style>
     </template>

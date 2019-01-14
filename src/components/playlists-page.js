@@ -119,7 +119,7 @@ class PlaylistsPage extends PolymerElement {
           <div
             data-action="open"
             data-playlist$="[[playlist.id]]"
-            class$="card playlist-card[[_isYourPlaylist(playlist.isYours)]]"
+            class$="card playlist-card[[_isYourPlaylist(user.id, playlist.user.id)]]"
             on-click="_playlistClick"
           >
             <div
@@ -149,8 +149,8 @@ class PlaylistsPage extends PolymerElement {
                 by [[playlist.user.username]]
               </p>
             </div>
-            <template is="dom-if" if="[[playlist.isYours]]">
-              <div
+            <template is="dom-if" if="[[_equals(user.id, playlist.user.id)]]">
+              <button
                 data-action="options"
                 data-playlist$="[[playlist.id]]"
                 class="icon-button"
@@ -162,7 +162,7 @@ class PlaylistsPage extends PolymerElement {
                   icon="options"
                 ></iron-icon>
                 <paper-ripple center></paper-ripple>
-              </div>
+              </button>
             </template>
             <paper-ripple></paper-ripple>
           </div>
@@ -177,7 +177,8 @@ class PlaylistsPage extends PolymerElement {
         observer: "_activeChanged"
       },
       tracks: Array,
-      playlists: Array
+      playlists: Array,
+      user: Object
     };
   }
 
@@ -187,8 +188,12 @@ class PlaylistsPage extends PolymerElement {
     }
   }
 
-  _isYourPlaylist(isYours) {
-    return isYours ? " yours" : "";
+  _isYourPlaylist(id, owner) {
+    return id === owner ? " yours" : "";
+  }
+
+  _equals(value, check) {
+    return value === check;
   }
 
   _onDown(e) {

@@ -44,7 +44,7 @@ class LoginPage extends PolymerElement {
 
         .login-button {
           position: relative;
-          margin: 8px auto;
+          margin: 8px calc(50% - 64px);
           width: 128px;
           height: 32px;
           line-height: 32px;

@@ -113,7 +113,7 @@ class HomePage extends PolymerElement {
                 [[track.artist]]
               </p>
             </div>
-            <div
+            <button
               data-action="options"
               data-track$="[[track.id]]"
               class="icon-button"
@@ -125,7 +125,7 @@ class HomePage extends PolymerElement {
                 icon="options"
               ></iron-icon>
               <paper-ripple center></paper-ripple>
-            </div>
+            </button>
             <paper-ripple></paper-ripple>
           </div>
         </template>

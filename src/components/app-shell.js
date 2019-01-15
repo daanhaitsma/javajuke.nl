@@ -64,12 +64,14 @@ class AppShell extends PolymerElement {
             player="[[player]]"
             active="[[_isActive(page, 'player')]]"
           ></player-page>
-          <home-page
-            name="home"
+          <tracks-page
+            name="tracks"
+            user="[[user]]"
             player="[[player]]"
             tracks="[[tracks]]"
-            active="[[_isActive(page, 'home')]]"
-          ></home-page>
+            playlists="[[playlists]]"
+            active="[[_isActive(page, 'tracks')]]"
+          ></tracks-page>
           <playlists-page
             name="playlists"
             tracks="[[tracks]]"
@@ -80,7 +82,8 @@ class AppShell extends PolymerElement {
           <playlist-page
             name="playlist"
             player="[[player]]"
-            playlists="[[playlists]]"
+            playlist="[[playlist]]"
+            user="[[user]]"
             route="[[subroute]]"
             active="[[_isActive(page, 'playlist')]]"
           ></playlist-page>
@@ -125,6 +128,7 @@ class AppShell extends PolymerElement {
       },
       tracks: Array,
       playlists: Array,
+      playlist: Object,
       user: Object,
       playerInterval: Object,
       stateInterval: Object
@@ -148,8 +152,7 @@ class AppShell extends PolymerElement {
     super.ready();
 
     this._setupHistory();
-    // this._checkAuth();
-    this._getData();
+    this._checkAuth();
 
     vhCheck();
 
@@ -157,12 +160,12 @@ class AppShell extends PolymerElement {
       this.set("offline", offline);
     });
 
-    this.set(
-      "stateInterval",
-      setInterval(() => {
-        this._getState();
-      }, 2000)
-    );
+    // this.set(
+    //   "stateInterval",
+    //   setInterval(() => {
+    //     this._getState();
+    //   }, 2000)
+    // );
 
     window.addEventListener("set-path", e =>
       this._setPath(e.detail.path, e.detail.history)
@@ -172,10 +175,30 @@ class AppShell extends PolymerElement {
     window.addEventListener("play-playlist", e =>
       this._playPlaylist(e.detail.playlist)
     );
-    window.addEventListener("next-track", e => this._nextTrack());
-    window.addEventListener("previous-track", e => this._previousTrack());
+    window.addEventListener("next-track", () => this._nextTrack());
+    window.addEventListener("previous-track", () => this._previousTrack());
     window.addEventListener("toggle-state", e =>
       this._toggleState(e.detail.state)
+    );
+    window.addEventListener("get-tracks", () => this._getTracks());
+    window.addEventListener("delete-track", e =>
+      this._deleteTrack(e.detail.track)
+    );
+    window.addEventListener("get-playlists", () => this._getPlaylists());
+    window.addEventListener("create-playlist", e =>
+      this._createPlaylist(e.detail.name)
+    );
+    window.addEventListener("get-playlist", e =>
+      this._getPlaylist(e.detail.playlist)
+    );
+    window.addEventListener("remove-playlist", e =>
+      this._removePlaylist(e.detail.playlist)
+    );
+    window.addEventListener("remove-from-playlist", e =>
+      this._removeFromPlaylist(e.detail.playlist, e.detail.track)
+    );
+    window.addEventListener("add-to-playlist", e =>
+      this._addToPlaylist(e.detail.playlist, e.detail.track)
     );
     window.addEventListener("login-user", e =>
       this._login(e.detail.username, e.detail.password)
@@ -207,8 +230,8 @@ class AppShell extends PolymerElement {
       case "player":
         import("./player-page.js");
         break;
-      case "home":
-        import("./home-page.js");
+      case "tracks":
+        import("./tracks-page.js");
         break;
       case "playlists":
         import("./playlists-page.js");
@@ -293,21 +316,7 @@ class AppShell extends PolymerElement {
     });
   }
 
-  _login(username, password) {
-    this.$.repositoryAuth
-      .login("", username, password)
-      .then(result => {
-        cookieHelper.setCookie("auth_token", result.token, 1440);
-        this.set("user", result);
-        this._setPath("/home", []);
-        this._getData();
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }
-
-  _getData() {
+  _getTracks() {
     this.$.repositoryTracks
       .getTracks()
       .then(result => {
@@ -316,11 +325,92 @@ class AppShell extends PolymerElement {
       .catch(error => {
         console.log(error);
       });
+  }
 
+  _deleteTrack(track) {
+    this.$.repositoryTracks
+      .deleteTrack(track)
+      .then(() => {
+        this._getTracks();
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _getPlaylists() {
     this.$.repositoryPlaylists
       .getPlaylists()
       .then(result => {
         this.set("playlists", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _createPlaylist(name) {
+    this.$.repositoryPlaylists
+      .createPlaylist(name)
+      .then(result => {
+        this._setPath(`/playlist/${result.id}`);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _getPlaylist(playlist) {
+    this.$.repositoryPlaylists
+      .getPlaylist(playlist)
+      .then(result => {
+        this.set("playlist", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _removePlaylist(playlist) {
+    this.$.repositoryPlaylists
+      .removePlaylist(playlist)
+      .then(() => {
+        this._getPlaylists();
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _removeFromPlaylist(playlist, track) {
+    this.$.repositoryPlaylists
+      .removeFromPlaylist(playlist, track)
+      .then(result => {
+        this.set("playlist", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _addToPlaylist(playlist, track) {
+    this.$.repositoryPlaylists
+      .addToPlaylist(playlist, track)
+      .then(result => {
+        this.set("playlist", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _login(username, password) {
+    this.$.repositoryAuth
+      .login("", username, password)
+      .then(result => {
+        cookieHelper.setCookie("auth_token", result.token, 1440);
+        this.set("user", result);
+        this._setPath("/tracks", []);
       })
       .catch(error => {
         console.log(error);
@@ -333,8 +423,7 @@ class AppShell extends PolymerElement {
         .getUser()
         .then(result => {
           this.set("user", result);
-          this._getData();
-          this._setPath("/home", []);
+          this._setPath("/tracks", []);
         })
         .catch(error => {
           console.log(error);
@@ -353,7 +442,7 @@ class AppShell extends PolymerElement {
   _setupHistory() {
     if (window.history.state === null) {
       // if (cookieHelper.getCookie("auth_token")) {
-      window.history.pushState({ history: [] }, "", "/home");
+      window.history.pushState({ history: [] }, "", "/tracks");
       // } else {
       //   window.history.pushState({ history: [] }, "", "/login");
       // }

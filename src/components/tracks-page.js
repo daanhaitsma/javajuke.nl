@@ -1,10 +1,11 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/polymer/lib/elements/dom-repeat.js";
 import "@polymer/paper-ripple/paper-ripple.js";
+import "@polymer/paper-input/paper-input.js";
 import "../../assets/images/icons/icon-set.js";
 import "../style/shared-styles.js";
 
-class HomePage extends PolymerElement {
+class TracksPage extends PolymerElement {
   static get template() {
     return html`
       <style include="shared-styles">
@@ -77,7 +78,9 @@ class HomePage extends PolymerElement {
           justify-self: center;
         }
       </style>
-
+      <button class="add-new" on-click="_createPlaylist">
+        Add<paper-ripple></paper-ripple>
+      </button>
       <div class="content-grid">
         <template is="dom-repeat" items="[[tracks]]" as="track">
           <div
@@ -130,6 +133,45 @@ class HomePage extends PolymerElement {
           </div>
         </template>
       </div>
+      <template is="dom-if" if="[[optionsTrack]]">
+        <div data-action="close" class="overlay" on-click="_modalClick">
+          <div class="card card-modal">
+            <div class="modal-header">
+              <p class="modal-title">[[optionsTrack.title]]</p>
+              <p class="modal-subtitle">[[optionsTrack.artist]]</p>
+            </div>
+            <div class="modal-content">
+              <button data-action="addToPlaylist" class="modal-option">
+                Add track to playlist<paper-ripple></paper-ripple>
+              </button>
+              <button data-action="deleteTrack" class="modal-option">
+                Delete track<paper-ripple></paper-ripple>
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template is="dom-if" if="[[playlistTrack]]">
+        <div data-action="close" class="overlay" on-click="_modalClick">
+          <div class="card card-modal">
+            <div class="modal-header">
+              <p class="modal-title">Select the playlist</p>
+              <!-- <p class="modal-subtitle">[[playlistTrack.title]]</p> -->
+            </div>
+            <div class="modal-content">
+              <template is="dom-repeat" items="[[yourPlaylists]]" as="playlist">
+                <button
+                  data-action="selectPlaylist"
+                  data-playlist$="[[playlist.id]]"
+                  class="modal-option"
+                >
+                  [[playlist.name]]<paper-ripple></paper-ripple>
+                </button>
+              </template>
+            </div>
+          </div>
+        </div>
+      </template>
     `;
   }
   static get properties() {
@@ -138,15 +180,34 @@ class HomePage extends PolymerElement {
         type: Boolean,
         observer: "_activeChanged"
       },
+      user: Object,
       player: Object,
-      tracks: Array
+      tracks: Array,
+      playlists: {
+        type: Array,
+        observer: "_playlistsChanged"
+      },
+      yourPlaylists: Array,
+      optionsTrack: Object,
+      playlistTrack: Object
     };
   }
 
   _activeChanged(active) {
     if (active) {
-      console.log(active);
+      window.dispatchEvent(
+        new CustomEvent("get-tracks", {
+          detail: {}
+        })
+      );
     }
+  }
+
+  _playlistsChanged(playlists) {
+    let yourPlaylists = playlists.filter(playlist => {
+      return playlist.user.id === this.user.id;
+    });
+    this.set("yourPlaylists", yourPlaylists);
   }
 
   _active(track, activeTrack) {
@@ -160,6 +221,45 @@ class HomePage extends PolymerElement {
   _onDown(e) {
     // disable the ripple of the parent element
     e.stopPropagation();
+  }
+
+  _modalClick(e) {
+    if (e.target.dataset.action) {
+      switch (e.target.dataset.action) {
+        case "addToPlaylist":
+          window.dispatchEvent(
+            new CustomEvent("get-playlists", {
+              detail: {}
+            })
+          );
+          this.set("playlistTrack", this.get("optionsTrack"));
+          this.set("optionsTrack", null);
+          break;
+        case "deleteTrack":
+          window.dispatchEvent(
+            new CustomEvent("delete-track", {
+              detail: { track: this.get("optionsTrack").id }
+            })
+          );
+          this.set("optionsTrack", null);
+          break;
+        case "close":
+          this.set("optionsTrack", null);
+          this.set("playlistTrack", null);
+          break;
+        case "selectPlaylist":
+          window.dispatchEvent(
+            new CustomEvent("add-to-playlist", {
+              detail: {
+                playlist: e.target.dataset.playlist,
+                track: this.get("playlistTrack").id
+              }
+            })
+          );
+          this.set("playlistTrack", null);
+          break;
+      }
+    }
   }
 
   _trackClick(e) {
@@ -188,10 +288,10 @@ class HomePage extends PolymerElement {
         let track = this.tracks.find(item => {
           return item.id === Number(e.target.dataset.track);
         });
-        console.log(`Track: ${track.title} - ${track.artist}`);
+        this.set("optionsTrack", track);
         break;
     }
   }
 }
 
-window.customElements.define("home-page", HomePage);
+window.customElements.define("tracks-page", TracksPage);

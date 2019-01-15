@@ -2,6 +2,7 @@ import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/polymer/lib/elements/dom-repeat.js";
 import "@polymer/polymer/lib/elements/dom-if.js";
 import "@polymer/paper-ripple/paper-ripple.js";
+import "@polymer/paper-input/paper-input.js";
 import "../../assets/images/icons/icon-set.js";
 import "../style/shared-styles.js";
 
@@ -84,8 +85,27 @@ class PlaylistsPage extends PolymerElement {
           align-self: center;
           justify-self: center;
         }
+        .create-playlist {
+          position: relative;
+          margin: 8px calc(50% - 64px) 0px calc(50% - 64px);
+          width: 128px;
+          height: 32px;
+          line-height: 32px;
+          text-align: center;
+          font-weight: 600;
+          color: white;
+          border-radius: 24px;
+          background-color: var(--active-color);
+          box-shadow: var(--box-shadow);
+          transition: box-shadow 0.2s ease;
+        }
+        .create-playlist:active {
+          box-shadow: var(--box-shadow-active);
+        }
       </style>
-
+      <button class="add-new" on-click="_createPlaylist">
+        Create<paper-ripple></paper-ripple>
+      </button>
       <div class="content-grid">
         <!-- <div
           data-action="open"
@@ -168,6 +188,38 @@ class PlaylistsPage extends PolymerElement {
           </div>
         </template>
       </div>
+      <template is="dom-if" if="[[optionsPlaylist]]">
+        <div data-action="close" class="overlay" on-click="_modalClick">
+          <div class="card card-modal">
+            <div class="modal-header">
+              <p class="modal-title">[[optionsPlaylist.name]]</p>
+              <p class="modal-subtitle">by [[optionsPlaylist.user.username]]</p>
+            </div>
+            <div class="modal-content">
+              <button data-action="removePlaylist" class="modal-option">
+                Remove playlist<paper-ripple></paper-ripple>
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
+      <template is="dom-if" if="[[create]]">
+        <div data-action="close" class="overlay" on-click="_modalClick">
+          <div class="card card-modal">
+            <div class="modal-input-content">
+              <p class="modal-title">Create Playlist</p>
+              <paper-input
+                type="text"
+                label="Name"
+                value="{{playlist.name}}"
+              ></paper-input>
+              <button data-action="createPlaylist" class="create-playlist">
+                Create<paper-ripple></paper-ripple>
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
     `;
   }
   static get properties() {
@@ -178,13 +230,28 @@ class PlaylistsPage extends PolymerElement {
       },
       tracks: Array,
       playlists: Array,
+      playlist: {
+        type: Object,
+        value: {
+          name: ""
+        }
+      },
+      create: {
+        type: Boolean,
+        value: false
+      },
+      optionsPlaylist: Object,
       user: Object
     };
   }
 
   _activeChanged(active) {
     if (active) {
-      console.log(active);
+      window.dispatchEvent(
+        new CustomEvent("get-playlists", {
+          detail: {}
+        })
+      );
     }
   }
 
@@ -201,6 +268,42 @@ class PlaylistsPage extends PolymerElement {
     e.stopPropagation();
   }
 
+  _createPlaylist() {
+    this.set("create", true);
+  }
+
+  _modalClick(e) {
+    if (e.target.dataset.action) {
+      switch (e.target.dataset.action) {
+        case "removePlaylist":
+          window.dispatchEvent(
+            new CustomEvent("remove-playlist", {
+              detail: {
+                playlist: this.get("optionsPlaylist").id
+              }
+            })
+          );
+          this.set("optionsPlaylist", null);
+          break;
+        case "createPlaylist":
+          window.dispatchEvent(
+            new CustomEvent("create-playlist", {
+              detail: {
+                name: this.get("playlist").name
+              }
+            })
+          );
+          this.set("create", false);
+          this.set("playlist.name", "");
+          break;
+        case "close":
+          this.set("optionsPlaylist", null);
+          this.set("create", false);
+          break;
+      }
+    }
+  }
+
   _playlistClick(e) {
     switch (e.target.dataset.action) {
       case "open":
@@ -214,7 +317,7 @@ class PlaylistsPage extends PolymerElement {
         let playlist = this.playlists.find(item => {
           return item.id === Number(e.target.dataset.playlist);
         });
-        console.log(`Playlist: ${playlist.name} - ${playlist.user.username}`);
+        this.set("optionsPlaylist", playlist);
         break;
     }
   }

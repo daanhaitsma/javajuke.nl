@@ -15,7 +15,7 @@ export function loginUrl(id) {
 }
 
 export function getUserUrl() {
-  return `${apiBaseUrl}/getuser`;
+  return `${apiBaseUrl}/users`;
 }
 
 export function getTracksUrl() {
@@ -26,11 +26,31 @@ export function getTrackUrl(id) {
   return `${apiBaseUrl}/tracks/${id}`;
 }
 
+export function deleteTrackUrl(id) {
+  return `${apiBaseUrl}/tracks/${id}`;
+}
+
 export function getPlaylistsUrl() {
   return `${apiBaseUrl}/playlists`;
 }
 
+export function removeFromPlaylistUrl(playlist, track) {
+  return `${apiBaseUrl}/playlists/${playlist}/tracks/${track}`;
+}
+
+export function addToPlaylistUrl(playlist, track) {
+  return `${apiBaseUrl}/playlists/${playlist}/tracks/${track}`;
+}
+
+export function createPlaylistUrl() {
+  return `${apiBaseUrl}/playlists`;
+}
+
 export function getPlaylistUrl(id) {
+  return `${apiBaseUrl}/playlists/${id}`;
+}
+
+export function removePlaylistUrl(id) {
   return `${apiBaseUrl}/playlists/${id}`;
 }
 

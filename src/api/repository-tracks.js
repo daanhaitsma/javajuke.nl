@@ -21,6 +21,14 @@ class RepositoryTracks extends PolymerElement {
         handle-as="json"
       >
       </iron-ajax>
+      <iron-ajax
+        id="deleteTrack"
+        method="DELETE"
+        url="[[deleteTrackUrl]]"
+        headers="[[headers]]"
+        handle-as="json"
+      >
+      </iron-ajax>
     `;
   }
   static get properties() {
@@ -30,6 +38,7 @@ class RepositoryTracks extends PolymerElement {
         value: apiHelper.getTracksUrl()
       },
       getTrackUrl: String,
+      deleteTrackUrl: String,
       headers: {
         type: Object,
         value: apiHelper.getApiHeaders()
@@ -42,7 +51,7 @@ class RepositoryTracks extends PolymerElement {
       this.$.getTracks
         .generateRequest()
         .completes.then(request => {
-          let tracks = request.response;
+          let tracks = request.response.data;
           resolve(tracks);
         })
         .catch(error => {
@@ -55,6 +64,21 @@ class RepositoryTracks extends PolymerElement {
       this.set("headers", apiHelper.getApiHeaders());
       this.set("getTrackUrl", apiHelper.getTrackUrl(id));
       this.$.getTrack
+        .generateRequest()
+        .completes.then(request => {
+          let track = request.response;
+          resolve(track);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+  deleteTrack(id) {
+    return new Promise((resolve, reject) => {
+      this.set("headers", apiHelper.getApiHeaders());
+      this.set("deleteTrackUrl", apiHelper.deleteTrackUrl(id));
+      this.$.deleteTrack
         .generateRequest()
         .completes.then(request => {
           let track = request.response;

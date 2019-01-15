@@ -66,20 +66,18 @@ class LoginPage extends PolymerElement {
         <img class="logo" src="assets/images/manifest/icon-512x512.png" />
         <div class="card login-card">
           <paper-input
-            class="input"
             type="text"
             label="Username"
             value="{{username}}"
           ></paper-input>
           <paper-input
-            class="input"
             type="password"
             label="Password"
             value="{{password}}"
           ></paper-input>
-          <div class="login-button" on-click="_login">
+          <button class="login-button" on-click="_login">
             LOGIN<paper-ripple></paper-ripple>
-          </div>
+          </button>
         </div>
       </div>
     `;

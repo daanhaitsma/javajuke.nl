@@ -1,5 +1,6 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/polymer/lib/elements/dom-repeat.js";
+import "@polymer/polymer/lib/elements/dom-if.js";
 import "@polymer/app-route/app-route.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "../../assets/images/icons/icon-set.js";
@@ -63,9 +64,12 @@ class PlaylistPage extends PolymerElement {
           width: 100%;
           height: 64px;
           box-sizing: border-box;
-          grid-template-columns: 48px 1fr 48px;
+          grid-template-columns: 48px 1fr;
           grid-template-rows: 1fr;
           grid-column-gap: 8px;
+        }
+        .track-card.yours {
+          grid-template-columns: 48px 1fr 48px;
         }
         .track-card-disc {
           width: 100%;
@@ -102,12 +106,6 @@ class PlaylistPage extends PolymerElement {
           align-self: center;
           justify-self: center;
         }
-        .card-modal {
-          width: calc(100% - 64px);
-          max-width: 328px;
-          max-height: calc(100% - 64px);
-          overflow-y: auto;
-        }
       </style>
 
       <app-route route="{{route}}" pattern="/:playlist" data="{{routeData}}">
@@ -125,7 +123,7 @@ class PlaylistPage extends PolymerElement {
           <div
             data-action="play"
             data-track$="[[track.id]]"
-            class="card track-card"
+            class$="card track-card[[_isYourPlaylist(user.id, playlist.user.id)]]"
             on-click="_trackClick"
           >
             <img
@@ -155,28 +153,43 @@ class PlaylistPage extends PolymerElement {
                 [[track.artist]]
               </p>
             </div>
-            <button
-              data-action="options"
-              data-track$="[[track.id]]"
-              class="icon-button"
-              on-down="_onDown"
-            >
-              <iron-icon
+            <template is="dom-if" if="[[_equals(user.id, playlist.user.id)]]">
+              <button
                 data-action="options"
                 data-track$="[[track.id]]"
-                icon="options"
-              ></iron-icon>
-              <paper-ripple center></paper-ripple>
-            </button>
+                class="icon-button"
+                on-down="_onDown"
+              >
+                <iron-icon
+                  data-action="options"
+                  data-track$="[[track.id]]"
+                  icon="options"
+                ></iron-icon>
+                <paper-ripple center></paper-ripple>
+              </button>
+            </template>
             <paper-ripple></paper-ripple>
           </div>
         </template>
       </div>
-      <!-- <div class="overlay">
-        <div class="card card-modal">
-
+      <template is="dom-if" if="[[selected]]">
+        <div data-action="close" class="overlay" on-click="_modalClick">
+          <div class="card card-modal">
+            <div class="modal-header">
+              <p class="modal-title">[[selected.title]]</p>
+              <p class="modal-subtitle">[[selected.artist]]</p>
+            </div>
+            <div class="modal-content">
+              <!-- <button data-action="addToPlaylist" class="modal-option">
+                Add to another playlist<paper-ripple></paper-ripple>
+              </button> -->
+              <button data-action="removeFromPlaylist" class="modal-option">
+                Remove track from playlist<paper-ripple></paper-ripple>
+              </button>
+            </div>
+          </div>
         </div>
-      </div> -->
+      </template>
     `;
   }
   static get properties() {
@@ -187,23 +200,25 @@ class PlaylistPage extends PolymerElement {
         type: Boolean,
         observer: "_activeChanged"
       },
+      user: Object,
       player: Object,
-      playlists: Array,
-      playlist: Object
+      playlist: Object,
+      selected: Object
     };
   }
 
   static get observers() {
-    return ["_playlistChanged(routeData.playlist, playlists)"];
+    return ["_playlistChanged(routeData.playlist)"];
   }
 
-  _playlistChanged(playlist, playlists) {
+  _playlistChanged(playlist) {
     playlist = Number(playlist);
-    if (playlist > 0 && playlists) {
-      this.set(
-        "playlist",
-        this.playlists.find(item => {
-          return item.id === playlist;
+    if (playlist > 0) {
+      window.dispatchEvent(
+        new CustomEvent("get-playlist", {
+          detail: {
+            playlist: playlist
+          }
         })
       );
     }
@@ -213,6 +228,14 @@ class PlaylistPage extends PolymerElement {
     if (active) {
       console.log(active);
     }
+  }
+
+  _equals(value, check) {
+    return value === check;
+  }
+
+  _isYourPlaylist(id, owner) {
+    return id === owner ? " yours" : "";
   }
 
   _active(track, activeTrack) {
@@ -236,6 +259,30 @@ class PlaylistPage extends PolymerElement {
   _onDown(e) {
     // disable the ripple of the parent element
     e.stopPropagation();
+  }
+
+  _modalClick(e) {
+    if (e.target.dataset.action) {
+      switch (e.target.dataset.action) {
+        case "addToPlaylist":
+          this.set("selected", null);
+          break;
+        case "removeFromPlaylist":
+          window.dispatchEvent(
+            new CustomEvent("remove-from-playlist", {
+              detail: {
+                playlist: this.get("playlist").id,
+                track: this.get("selected").id
+              }
+            })
+          );
+          this.set("selected", null);
+          break;
+        case "close":
+          this.set("selected", null);
+          break;
+      }
+    }
   }
 
   _trackClick(e) {
@@ -264,7 +311,7 @@ class PlaylistPage extends PolymerElement {
         let track = this.playlist.tracks.find(item => {
           return item.id === Number(e.target.dataset.track);
         });
-        console.log(`Track: ${track.title} - ${track.artist}`);
+        this.set("selected", track);
         break;
     }
   }

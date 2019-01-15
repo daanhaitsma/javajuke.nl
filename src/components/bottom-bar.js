@@ -12,7 +12,7 @@ class BottomBar extends PolymerElement {
           position: relative;
           z-index: 2;
           display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
+          grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
           grid-template-rows: 47px;
           grid-row-gap: 16px;
           justify-items: center;
@@ -161,7 +161,11 @@ class BottomBar extends PolymerElement {
                 [[player.track.artist]]
               </p>
             </div>
-            <button data-action="playPause" class="icon-button" on-down="_onDown">
+            <button
+              data-action="playPause"
+              class="icon-button"
+              on-down="_onDown"
+            >
               <iron-icon
                 data-action="playPause"
                 icon$="[[_getIcon(player.state.paused)]]"
@@ -182,6 +186,19 @@ class BottomBar extends PolymerElement {
             <paper-ripple class="ripple" center></paper-ripple>
           </div>
           <div
+            class$="bottom-bar-button[[_activePage('tracks', page)]]"
+            data-path="/tracks"
+            on-click="_navigate"
+          >
+            <iron-icon data-path="/tracks" icon="track"></iron-icon>
+            <p data-path="/tracks" class="bottom-bar-title">Tracks</p>
+            <paper-ripple
+              data-path="/tracks"
+              class="ripple"
+              center
+            ></paper-ripple>
+          </div>
+          <div
             class$="bottom-bar-button[[_activePage('playlists', page)]]"
             data-path="/playlists"
             on-click="_navigate"
@@ -190,6 +207,19 @@ class BottomBar extends PolymerElement {
             <p data-path="/playlists" class="bottom-bar-title">Playlists</p>
             <paper-ripple
               data-path="/playlists"
+              class="ripple"
+              center
+            ></paper-ripple>
+          </div>
+          <div
+            class$="bottom-bar-button[[_activePage('search', page)]]"
+            data-path="/search"
+            on-click="_navigate"
+          >
+            <iron-icon data-path="/search" icon="search"></iron-icon>
+            <p data-path="/search" class="bottom-bar-title">Search</p>
+            <paper-ripple
+              data-path="/search"
               class="ripple"
               center
             ></paper-ripple>
@@ -247,7 +277,7 @@ class BottomBar extends PolymerElement {
   _home() {
     window.dispatchEvent(
       new CustomEvent("set-path", {
-        detail: { path: "/home", history: [] }
+        detail: { path: "/tracks", history: [] }
       })
     );
   }
@@ -255,7 +285,7 @@ class BottomBar extends PolymerElement {
   _navigate(e) {
     window.dispatchEvent(
       new CustomEvent("set-path", {
-        detail: { path: e.target.dataset.path, history: ["/home"] }
+        detail: { path: e.target.dataset.path, history: ["/tracks"] }
       })
     );
   }

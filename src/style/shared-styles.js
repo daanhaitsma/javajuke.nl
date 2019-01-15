@@ -119,6 +119,77 @@ $_documentContainer.innerHTML = `
           left: 50%;
           transform: translate(-50%, -50%);
         }
+
+        .card-modal {
+          width: calc(100% - 64px);
+          max-width: 328px;
+          max-height: calc(100% - 64px);
+          overflow-y: auto;
+        }
+
+        .modal-header {
+          padding: 8px 16px;
+        }
+
+        .modal-title {
+          font-size: 16px;
+          font-weight: 600;
+          text-align: center;
+          color: #757575;
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .modal-subtitle {
+          font-size: 14px;
+          text-align: center;
+          color: #bdbdbd;
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .modal-content {
+          display: grid;
+          grid-template-columns: 100%;
+          grid-auto-rows: 48px;
+          align-items: center;
+          justify-items: center;
+        }
+
+        .modal-input-content {
+          padding: 8px 16px
+        }
+
+        .modal-option {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          color: #757575;
+          border-top: solid 1px #eee;
+        }
+
+        .add-new {
+          position: relative;
+          margin: 16px calc(50% - 64px) 0px calc(50% - 64px);
+          width: 128px;
+          height: 32px;
+          line-height: 32px;
+          text-align: center;
+          font-weight: 600;
+          color: white;
+          border-radius: 24px;
+          background-color: var(--active-color);
+          box-shadow: var(--box-shadow);
+          transition: box-shadow 0.2s ease;
+        }
+        
+        .add-new:active {
+          box-shadow: var(--box-shadow-active);
+        }
       </style>
     </template>
   </dom-module>

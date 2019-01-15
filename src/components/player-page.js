@@ -168,7 +168,7 @@ class PlayerPage extends PolymerElement {
     if (this.active && !track) {
       window.dispatchEvent(
         new CustomEvent("set-path", {
-          detail: { path: "/home", history: [] }
+          detail: { path: "/tracks", history: [] }
         })
       );
     }

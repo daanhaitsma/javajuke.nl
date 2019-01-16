@@ -14,6 +14,15 @@ class RepositoryTracks extends PolymerElement {
       >
       </iron-ajax>
       <iron-ajax
+        id="searchTracks"
+        method="GET"
+        url="[[searchTracksUrl]]"
+        params="[[searchTracksParams]]"
+        headers="[[headers]]"
+        handle-as="json"
+      >
+      </iron-ajax>
+      <iron-ajax
         id="getTrack"
         method="GET"
         url="[[getTrackUrl]]"
@@ -37,8 +46,13 @@ class RepositoryTracks extends PolymerElement {
         type: String,
         value: apiHelper.getTracksUrl()
       },
+      searchTracksUrl: {
+        type: String,
+        value: apiHelper.searchTracksUrl()
+      },
       getTrackUrl: String,
       deleteTrackUrl: String,
+      searchTracksParams: Object,
       headers: {
         type: Object,
         value: apiHelper.getApiHeaders()
@@ -49,6 +63,21 @@ class RepositoryTracks extends PolymerElement {
     return new Promise((resolve, reject) => {
       this.set("headers", apiHelper.getApiHeaders());
       this.$.getTracks
+        .generateRequest()
+        .completes.then(request => {
+          let tracks = request.response.data;
+          resolve(tracks);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+  searchTracks(search) {
+    return new Promise((resolve, reject) => {
+      this.set("headers", apiHelper.getApiHeaders());
+      this.set("searchTracksParams", { search: search });
+      this.$.searchTracks
         .generateRequest()
         .completes.then(request => {
           let tracks = request.response.data;

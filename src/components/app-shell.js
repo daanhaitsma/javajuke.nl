@@ -6,20 +6,21 @@ import {
 import { vhCheck } from "../utils/viewportHeightCheck.js";
 import { addOfflineListener } from "../utils/offlineListener.js";
 import * as cookieHelper from "../utils/cookieHelper.js";
-// import "@polymer/polymer/lib/elements/dom-if.js";
 import "@polymer/app-route/app-location.js";
 import "@polymer/app-route/app-route.js";
 import "@polymer/iron-pages/iron-pages.js";
+import "@polymer/paper-toast/paper-toast.js";
 import "./bottom-bar.js";
 import "../api/repository-auth.js";
 import "../api/repository-tracks.js";
 import "../api/repository-playlists.js";
 import "../api/repository-player.js";
+import "../style/shared-styles.js";
 
 class AppShell extends PolymerElement {
   static get template() {
     return html`
-      <style>
+      <style include="shared-styles">
         :root {
           height: 100vh;
           height: calc(var(--vh, 1vh) * 100);
@@ -36,6 +37,14 @@ class AppShell extends PolymerElement {
         }
         .hidden {
           opacity: 0;
+        }
+        .toast {
+          border-radius: 16px;
+          color: white;
+          background-color: var(--active-color);
+        }
+        .toast.error {
+          background-color: #B71C1C;
         }
       </style>
       <repository-auth id="repositoryAuth"></repository-auth>
@@ -72,6 +81,14 @@ class AppShell extends PolymerElement {
             playlists="[[playlists]]"
             active="[[_isActive(page, 'tracks')]]"
           ></tracks-page>
+          <search-page
+            name="search"
+            user="[[user]]"
+            player="[[player]]"
+            search-tracks="[[searchTracks]]"
+            playlists="[[playlists]]"
+            active="[[_isActive(page, 'search')]]"
+          ></search-page>
           <playlists-page
             name="playlists"
             tracks="[[tracks]]"
@@ -94,6 +111,18 @@ class AppShell extends PolymerElement {
           <div name="404">404</div>
         </iron-pages>
         <bottom-bar page="[[routeData.page]]" player="[[player]]"></bottom-bar>
+        <paper-toast
+          id="successToast"
+          class="toast"
+          text="[[successsuccessToastMessage]]"
+          on-click="_closeSuccessToast"
+        ></paper-toast>
+        <paper-toast
+          id="errorToast"
+          class="toast error"
+          text="[[errorToastMessage]]"
+          on-click="_closeErrorToast"
+        ></paper-toast>
       </div>
     `;
   }
@@ -129,9 +158,12 @@ class AppShell extends PolymerElement {
       tracks: Array,
       playlists: Array,
       playlist: Object,
+      searchTracks: Array,
       user: Object,
       playerInterval: Object,
-      stateInterval: Object
+      stateInterval: Object,
+      successToastMessage: String,
+      errorToastMessage: String
     };
   }
 
@@ -181,6 +213,9 @@ class AppShell extends PolymerElement {
       this._toggleState(e.detail.state)
     );
     window.addEventListener("get-tracks", () => this._getTracks());
+    window.addEventListener("search-tracks", e =>
+      this._searchTracks(e.detail.search)
+    );
     window.addEventListener("delete-track", e =>
       this._deleteTrack(e.detail.track)
     );
@@ -203,6 +238,14 @@ class AppShell extends PolymerElement {
     window.addEventListener("login-user", e =>
       this._login(e.detail.username, e.detail.password)
     );
+  }
+
+  _closeSuccessToast() {
+    this.$.successToast.close();
+  }
+
+  _closeErrorToast() {
+    this.$.errorToast.close();
   }
 
   _playingChanged(playing) {
@@ -232,6 +275,9 @@ class AppShell extends PolymerElement {
         break;
       case "tracks":
         import("./tracks-page.js");
+        break;
+      case "search":
+        import("./search-page.js");
         break;
       case "playlists":
         import("./playlists-page.js");
@@ -327,11 +373,24 @@ class AppShell extends PolymerElement {
       });
   }
 
+  _searchTracks(search) {
+    this.$.repositoryTracks
+      .searchTracks(search)
+      .then(result => {
+        this.set("searchTracks", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
   _deleteTrack(track) {
     this.$.repositoryTracks
       .deleteTrack(track)
       .then(() => {
         this._getTracks();
+        this.set("successToastMessage", "Track was successfully deleted");
+        this.$.successToast.open();
       })
       .catch(error => {
         console.log(error);
@@ -376,6 +435,8 @@ class AppShell extends PolymerElement {
       .removePlaylist(playlist)
       .then(() => {
         this._getPlaylists();
+        this.set("successToastMessage", "Playlist was successfully removed");
+        this.$.successToast.open();
       })
       .catch(error => {
         console.log(error);
@@ -387,6 +448,11 @@ class AppShell extends PolymerElement {
       .removeFromPlaylist(playlist, track)
       .then(result => {
         this.set("playlist", result);
+        this.set(
+          "successToastMessage",
+          "Track was successfully removed from playlist"
+        );
+        this.$.successToast.open();
       })
       .catch(error => {
         console.log(error);
@@ -396,10 +462,16 @@ class AppShell extends PolymerElement {
   _addToPlaylist(playlist, track) {
     this.$.repositoryPlaylists
       .addToPlaylist(playlist, track)
-      .then(result => {
-        this.set("playlist", result);
+      .then(() => {
+        this.set(
+          "successToastMessage",
+          "Track was successfully added to playlist"
+        );
+        this.$.successToast.open();
       })
       .catch(error => {
+        this.set("errorToastMessage", "Track already exists in playlist");
+        this.$.errorToast.open();
         console.log(error);
       });
   }

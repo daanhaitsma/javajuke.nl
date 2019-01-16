@@ -22,6 +22,10 @@ export function getTracksUrl() {
   return `${apiBaseUrl}/tracks`;
 }
 
+export function searchTracksUrl() {
+  return `${apiBaseUrl}/tracks`;
+}
+
 export function getTrackUrl(id) {
   return `${apiBaseUrl}/tracks/${id}`;
 }

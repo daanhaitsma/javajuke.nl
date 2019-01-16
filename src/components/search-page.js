@@ -1,10 +1,11 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/polymer/lib/elements/dom-repeat.js";
 import "@polymer/paper-ripple/paper-ripple.js";
+import "@polymer/paper-input/paper-input.js";
 import "../../assets/images/icons/icon-set.js";
 import "../style/shared-styles.js";
 
-class TracksPage extends PolymerElement {
+class SearchPage extends PolymerElement {
   static get template() {
     return html`
       <style include="shared-styles">
@@ -76,12 +77,20 @@ class TracksPage extends PolymerElement {
           align-self: center;
           justify-self: center;
         }
+        .search {
+          width: calc(100% - 32px);
+          max-width: 328px;
+          margin: 8px auto 0px auto;
+        }
       </style>
-      <button class="add-new" on-click="_addTrack">
-        Add<paper-ripple></paper-ripple>
-      </button>
+      <paper-input
+        class="search"
+        type="text"
+        label="Search"
+        value="{{searchQuery}}"
+      ></paper-input>
       <div class="content-grid">
-        <template is="dom-repeat" items="[[tracks]]" as="track">
+        <template is="dom-repeat" items="[[searchTracks]]" as="track">
           <div
             data-action="play"
             data-track$="[[track.id]]"
@@ -180,24 +189,25 @@ class TracksPage extends PolymerElement {
       },
       user: Object,
       player: Object,
-      tracks: Array,
+      searchTracks: Array,
       playlists: {
         type: Array,
         observer: "_playlistsChanged"
       },
       yourPlaylists: Array,
       optionsTrack: Object,
-      playlistTrack: Object
+      playlistTrack: Object,
+      searchQuery: {
+        type: String,
+        value: "",
+        observer: "_searchQueryChanged"
+      }
     };
   }
 
   _activeChanged(active) {
     if (active) {
-      window.dispatchEvent(
-        new CustomEvent("get-tracks", {
-          detail: {}
-        })
-      );
+      this.set("searchQuery", "");
     }
   }
 
@@ -206,6 +216,14 @@ class TracksPage extends PolymerElement {
       return playlist.user.id === this.user.id;
     });
     this.set("yourPlaylists", yourPlaylists);
+  }
+
+  _searchQueryChanged(searchQuery) {
+    window.dispatchEvent(
+      new CustomEvent("search-tracks", {
+        detail: { search: searchQuery }
+      })
+    );
   }
 
   _active(track, activeTrack) {
@@ -287,7 +305,7 @@ class TracksPage extends PolymerElement {
         // );
         break;
       case "options":
-        let track = this.tracks.find(item => {
+        let track = this.searchTracks.find(item => {
           return item.id === Number(e.target.dataset.track);
         });
         this.set("optionsTrack", track);
@@ -296,4 +314,4 @@ class TracksPage extends PolymerElement {
   }
 }
 
-window.customElements.define("tracks-page", TracksPage);
+window.customElements.define("search-page", SearchPage);

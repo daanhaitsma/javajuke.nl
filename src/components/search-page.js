@@ -293,7 +293,7 @@ class SearchPage extends PolymerElement {
           window.dispatchEvent(
             new CustomEvent("set-track", {
               detail: {
-                track: this.tracks.find(item => {
+                track: this.searchTracks.find(item => {
                   return item.id === Number(e.target.dataset.track);
                 })
               }

@@ -67,11 +67,11 @@ export function togglePlayUrl() {
 }
 
 export function toggleShuffleUrl() {
-  return `${apiBaseUrl}/player/shuffle`;
+  return `${apiBaseUrl}/player/toggleshuffle`;
 }
 
 export function toggleRepeatUrl() {
-  return `${apiBaseUrl}/player/repeat`;
+  return `${apiBaseUrl}/player/togglerepeat`;
 }
 
 export function nextTrackUrl() {

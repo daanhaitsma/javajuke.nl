@@ -59,27 +59,27 @@ export function removePlaylistUrl(id) {
 }
 
 export function getStateUrl() {
-  return `${apiBaseUrl}/playerstate`;
+  return `${apiBaseUrl}/player/state`;
 }
 
 export function togglePlayUrl() {
-  return `${apiBaseUrl}/toggleplay`;
+  return `${apiBaseUrl}/player/toggleplay`;
 }
 
 export function toggleShuffleUrl() {
-  return `${apiBaseUrl}/shuffle`;
+  return `${apiBaseUrl}/player/shuffle`;
 }
 
 export function toggleRepeatUrl() {
-  return `${apiBaseUrl}/repeat`;
+  return `${apiBaseUrl}/player/repeat`;
 }
 
 export function nextTrackUrl() {
-  return `${apiBaseUrl}/nextsong`;
+  return `${apiBaseUrl}/player/next`;
 }
 
 export function previousTrackUrl() {
-  return `${apiBaseUrl}/previoussong`;
+  return `${apiBaseUrl}/player/previous`;
 }
 
 export function playPlaylistUrl(id) {

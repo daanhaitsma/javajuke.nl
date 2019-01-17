@@ -44,7 +44,7 @@ class AppShell extends PolymerElement {
           background-color: var(--active-color);
         }
         .toast.error {
-          background-color: #B71C1C;
+          background-color: #b71c1c;
         }
       </style>
       <repository-auth id="repositoryAuth"></repository-auth>
@@ -70,13 +70,18 @@ class AppShell extends PolymerElement {
         >
           <player-page
             name="player"
-            player="[[player]]"
+            state="[[state]]"
             active="[[_isActive(page, 'player')]]"
           ></player-page>
+          <home-page
+            name="home"
+            state="[[state]]"
+            active="[[_isActive(page, 'home')]]"
+          ></home-page>
           <tracks-page
             name="tracks"
             user="[[user]]"
-            player="[[player]]"
+            state="[[state]]"
             tracks="[[tracks]]"
             playlists="[[playlists]]"
             active="[[_isActive(page, 'tracks')]]"
@@ -84,7 +89,7 @@ class AppShell extends PolymerElement {
           <search-page
             name="search"
             user="[[user]]"
-            player="[[player]]"
+            state="[[state]]"
             search-tracks="[[searchTracks]]"
             playlists="[[playlists]]"
             active="[[_isActive(page, 'search')]]"
@@ -98,7 +103,7 @@ class AppShell extends PolymerElement {
           ></playlists-page>
           <playlist-page
             name="playlist"
-            player="[[player]]"
+            state="[[state]]"
             playlist="[[playlist]]"
             user="[[user]]"
             route="[[subroute]]"
@@ -110,11 +115,11 @@ class AppShell extends PolymerElement {
           ></login-page>
           <div name="404">404</div>
         </iron-pages>
-        <bottom-bar page="[[routeData.page]]" player="[[player]]"></bottom-bar>
+        <bottom-bar page="[[routeData.page]]" state="[[state]]"></bottom-bar>
         <paper-toast
           id="successToast"
           class="toast"
-          text="[[successsuccessToastMessage]]"
+          text="[[successToastMessage]]"
           on-click="_closeSuccessToast"
         ></paper-toast>
         <paper-toast
@@ -137,24 +142,13 @@ class AppShell extends PolymerElement {
       },
       page: {
         type: String,
-        value: ""
+        value: "login"
       },
       offline: {
         type: Boolean,
         value: false
       },
-      player: {
-        type: Object,
-        value: {
-          track: null,
-          state: {
-            playing: false,
-            shuffle: false,
-            repeat: false,
-            time: 0
-          }
-        }
-      },
+      state: Object,
       tracks: Array,
       playlists: Array,
       playlist: Object,
@@ -170,7 +164,7 @@ class AppShell extends PolymerElement {
   static get observers() {
     return [
       "_routePageChanged(routeData.page)",
-      "_playingChanged(player.state.playing)"
+      "_playingChanged(state.playing)"
     ];
   }
 
@@ -192,12 +186,12 @@ class AppShell extends PolymerElement {
       this.set("offline", offline);
     });
 
-    // this.set(
-    //   "stateInterval",
-    //   setInterval(() => {
-    //     this._getState();
-    //   }, 2000)
-    // );
+    this.set(
+      "stateInterval",
+      setInterval(() => {
+        this._getState();
+      }, 2000)
+    );
 
     window.addEventListener("set-path", e =>
       this._setPath(e.detail.path, e.detail.history)
@@ -212,9 +206,18 @@ class AppShell extends PolymerElement {
     window.addEventListener("toggle-state", e =>
       this._toggleState(e.detail.state)
     );
+    window.addEventListener("set-volume", e =>
+      this._setVolume(e.detail.volume)
+    );
+    window.addEventListener("add-to-queue", e =>
+      this._addToQueue(e.detail.track)
+    );
     window.addEventListener("get-tracks", () => this._getTracks());
     window.addEventListener("search-tracks", e =>
       this._searchTracks(e.detail.search)
+    );
+    window.addEventListener("upload-tracks", e =>
+      this._uploadTracks(e.detail.files)
     );
     window.addEventListener("delete-track", e =>
       this._deleteTrack(e.detail.track)
@@ -254,7 +257,7 @@ class AppShell extends PolymerElement {
       this.set(
         "playerInterval",
         setInterval(() => {
-          this._timer(this.player);
+          this._timer(this.state);
         }, 1000)
       );
     } else {
@@ -262,8 +265,8 @@ class AppShell extends PolymerElement {
     }
   }
 
-  _timer(player) {
-    this.set("player.state.position", player.state.position + 1);
+  _timer(state) {
+    this.set("state.position", state.position + 1);
   }
 
   _routePageChanged(page) {
@@ -272,6 +275,9 @@ class AppShell extends PolymerElement {
         return;
       case "player":
         import("./player-page.js");
+        break;
+      case "home":
+        import("./home-page.js");
         break;
       case "tracks":
         import("./tracks-page.js");
@@ -314,13 +320,23 @@ class AppShell extends PolymerElement {
     }
   }
 
-  _setTrack(track) {
-    this.set("player.track", track);
+  _addToQueue(track) {
+    this.$.repositoryPlayer.addToQueue(track.id).then(result => {
+      this.set("state", result);
+      this.set("successToastMessage", "Track was successfully added to queue");
+      this.$.successToast.open();
+    });
   }
 
   _getState() {
     this.$.repositoryPlayer.getState().then(result => {
-      this.set("player.state", result);
+      this.set("state", result);
+    });
+  }
+
+  _setVolume(volume) {
+    this.$.repositoryPlayer.setVolume(volume).then(result => {
+      this.set("state", result);
     });
   }
 
@@ -328,17 +344,17 @@ class AppShell extends PolymerElement {
     switch (state) {
       case "playing":
         this.$.repositoryPlayer.togglePlay().then(result => {
-          this.set("player.state", result);
+          this.set("state", result);
         });
         break;
       case "shuffle":
         this.$.repositoryPlayer.toggleShuffle().then(result => {
-          this.set("player.state", result);
+          this.set("state", result);
         });
         break;
       case "repeat":
         this.$.repositoryPlayer.toggleRepeat().then(result => {
-          this.set("player.state", result);
+          this.set("state", result);
         });
         break;
     }
@@ -346,19 +362,19 @@ class AppShell extends PolymerElement {
 
   _previousTrack() {
     this.$.repositoryPlayer.previousTrack().then(result => {
-      this.set("player.state", result);
+      this.set("state", result);
     });
   }
 
   _nextTrack() {
     this.$.repositoryPlayer.nextTrack().then(result => {
-      this.set("player.state", result);
+      this.set("state", result);
     });
   }
 
   _playPlaylist(playlist) {
     this.$.repositoryPlayer.playPlaylist(playlist).then(result => {
-      this.set("player.state", result);
+      this.set("state", result);
     });
   }
 
@@ -367,6 +383,17 @@ class AppShell extends PolymerElement {
       .getTracks()
       .then(result => {
         this.set("tracks", result);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
+  _uploadTracks(files) {
+    this.$.repositoryTracks
+      .uploadTracks(files)
+      .then(() => {
+        this._getTracks();
       })
       .catch(error => {
         console.log(error);
@@ -482,7 +509,7 @@ class AppShell extends PolymerElement {
       .then(result => {
         cookieHelper.setCookie("auth_token", result.token, 1440);
         this.set("user", result);
-        this._setPath("/tracks", []);
+        this._setPath("/home", []);
       })
       .catch(error => {
         console.log(error);
@@ -495,7 +522,7 @@ class AppShell extends PolymerElement {
         .getUser()
         .then(result => {
           this.set("user", result);
-          this._setPath("/tracks", []);
+          // this._setPath("/tracks", []);
         })
         .catch(error => {
           console.log(error);
@@ -513,11 +540,11 @@ class AppShell extends PolymerElement {
 
   _setupHistory() {
     if (window.history.state === null) {
-      // if (cookieHelper.getCookie("auth_token")) {
-      window.history.pushState({ history: [] }, "", "/tracks");
-      // } else {
-      //   window.history.pushState({ history: [] }, "", "/login");
-      // }
+      if (cookieHelper.getCookie("auth_token")) {
+        window.history.pushState({ history: [] }, "", "/home");
+      } else {
+        window.history.pushState({ history: [] }, "", "/login");
+      }
       window.dispatchEvent(new CustomEvent("location-changed"));
     } else {
       this.set("history", window.history.state.history);

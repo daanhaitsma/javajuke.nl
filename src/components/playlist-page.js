@@ -130,7 +130,7 @@ class PlaylistPage extends PolymerElement {
               data-action="play"
               data-track$="[[track.id]]"
               class="track-card-disc"
-              src="[[_getCoverArt(track.art)]]"
+              src="[[_getCoverArt(track.album.coverPath)]]"
               alt=""
             />
             <div
@@ -141,7 +141,7 @@ class PlaylistPage extends PolymerElement {
               <p
                 data-action="play"
                 data-track$="[[track.id]]"
-                class$="track-title[[_active(track.id, player.track.id)]]"
+                class$="track-title[[_active(track.id, state.currentTrack.id)]]"
               >
                 [[track.title]]
               </p>
@@ -180,9 +180,6 @@ class PlaylistPage extends PolymerElement {
               <p class="modal-subtitle">[[selected.artist]]</p>
             </div>
             <div class="modal-content">
-              <!-- <button data-action="addToPlaylist" class="modal-option">
-                Add to another playlist<paper-ripple></paper-ripple>
-              </button> -->
               <button data-action="removeFromPlaylist" class="modal-option">
                 Remove track from playlist<paper-ripple></paper-ripple>
               </button>
@@ -201,7 +198,7 @@ class PlaylistPage extends PolymerElement {
         observer: "_activeChanged"
       },
       user: Object,
-      player: Object,
+      state: Object,
       playlist: Object,
       selected: Object
     };
@@ -243,7 +240,10 @@ class PlaylistPage extends PolymerElement {
   }
 
   _getCoverArt(coverArt) {
-    return coverArt || "../../assets/images/icons/default_cover_art.svg";
+    return (
+      `../../assets/uploads/albumcover/${coverArt}` ||
+      "../../assets/images/icons/default_cover_art.svg"
+    );
   }
 
   _play() {
@@ -289,12 +289,12 @@ class PlaylistPage extends PolymerElement {
     switch (e.target.dataset.action) {
       case "play":
         if (
-          (this.player.track &&
-            this.player.track.id !== Number(e.target.dataset.track)) ||
-          !this.player.track
+          (this.state.currentTrack &&
+            this.state.currentTrack.id !== Number(e.target.dataset.track)) ||
+          !this.state.currentTrack
         ) {
           window.dispatchEvent(
-            new CustomEvent("set-track", {
+            new CustomEvent("add-to-queue", {
               detail: {
                 track: this.playlist.tracks.find(item => {
                   return item.id === Number(e.target.dataset.track);
@@ -303,9 +303,6 @@ class PlaylistPage extends PolymerElement {
             })
           );
         }
-        // window.dispatchEvent(
-        //   new CustomEvent("set-path", { detail: { path: "/player" } })
-        // );
         break;
       case "options":
         let track = this.playlist.tracks.find(item => {

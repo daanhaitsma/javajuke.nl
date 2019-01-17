@@ -137,28 +137,28 @@ class BottomBar extends PolymerElement {
       <template is="dom-if" if="[[_showBar(page)]]">
         <div
           data-action="player"
-          class$="active-track-bar[[_showActive(page, player.track)]]"
+          class$="active-track-bar[[_showActive(page, state.currentTrack)]]"
           on-click="_activeTrackClick"
         >
           <div data-data-action="player" class="progress-bar">
             <div
               data-action="player"
-              class$="progress[[_active(player.state.playing)]]"
-              style$="width: [[_getProgress(player.state.position, player.track.duration)]]%;"
+              class$="progress[[_active(state.playing)]]"
+              style$="width: [[_getProgress(state.position, state.currentTrack.duration)]]%;"
             ></div>
           </div>
           <div data-action="player" class="active-track-content">
             <img
               data-action="player"
               class="active-track-disc"
-              src="[[_getCoverArt(player.track.art)]]"
+              src="[[_getCoverArt(state.currentTrack.album.coverPath)]]"
             />
             <div data-action="player" class="active-track-info">
               <p data-action="player" class="active-track-title">
-                [[player.track.title]]
+                [[state.currentTrack.title]]
               </p>
               <p data-action="player" class="active-track-artist">
-                [[player.track.artist]]
+                [[state.currentTrack.artist]]
               </p>
             </div>
             <button
@@ -168,7 +168,7 @@ class BottomBar extends PolymerElement {
             >
               <iron-icon
                 data-action="playPause"
-                icon$="[[_getIcon(player.state.paused)]]"
+                icon$="[[_getIcon(state.paused)]]"
               ></iron-icon>
               <paper-ripple center></paper-ripple>
             </button>
@@ -236,7 +236,7 @@ class BottomBar extends PolymerElement {
   static get properties() {
     return {
       page: String,
-      player: Object
+      state: Object
     };
   }
 
@@ -262,7 +262,7 @@ class BottomBar extends PolymerElement {
   }
 
   _getCoverArt(coverArt) {
-    return coverArt || "../../assets/images/icons/default_cover_art.svg";
+    return `../../assets/uploads/albumcover/${coverArt}` || "../../assets/images/icons/default_cover_art.svg";
   }
 
   _active(active) {
@@ -277,7 +277,7 @@ class BottomBar extends PolymerElement {
   _home() {
     window.dispatchEvent(
       new CustomEvent("set-path", {
-        detail: { path: "/tracks", history: [] }
+        detail: { path: "/home", history: [] }
       })
     );
   }

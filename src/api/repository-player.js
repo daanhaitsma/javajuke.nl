@@ -14,6 +14,24 @@ class RepositoryPlayer extends PolymerElement {
       >
       </iron-ajax>
       <iron-ajax
+        id="setVolume"
+        method="PUT"
+        content-type="application/x-www-form-urlencoded"
+        url="[[setVolumeUrl]]"
+        body="[[setVolumeBody]]"
+        headers="[[headers]]"
+      >
+      </iron-ajax>
+      <iron-ajax
+        id="addToQueue"
+        method="PUT"
+        content-type="application/x-www-form-urlencoded"
+        url="[[addToQueueUrl]]"
+        body="[[addToQueueBody]]"
+        headers="[[headers]]"
+      >
+      </iron-ajax>
+      <iron-ajax
         id="togglePlay"
         method="PUT"
         url="[[togglePlayUrl]]"
@@ -69,6 +87,14 @@ class RepositoryPlayer extends PolymerElement {
         type: String,
         value: apiHelper.getStateUrl()
       },
+      setVolumeUrl: {
+        type: String,
+        value: apiHelper.setVolumeUrl()
+      },
+      addToQueueUrl: {
+        type: String,
+        value: apiHelper.addToQueueUrl()
+      },
       togglePlayUrl: {
         type: String,
         value: apiHelper.togglePlayUrl()
@@ -90,6 +116,8 @@ class RepositoryPlayer extends PolymerElement {
         value: apiHelper.previousTrackUrl()
       },
       playPlaylistUrl: String,
+      setVolumeBody: Object,
+      addToQueueBody: Object,
       headers: {
         type: Object,
         value: apiHelper.getApiHeaders()
@@ -100,6 +128,36 @@ class RepositoryPlayer extends PolymerElement {
     return new Promise((resolve, reject) => {
       this.set("headers", apiHelper.getApiHeaders());
       this.$.getState
+        .generateRequest()
+        .completes.then(request => {
+          let state = request.response;
+          resolve(this._formatState(state));
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+  setVolume(volume) {
+    return new Promise((resolve, reject) => {
+      this.set("headers", apiHelper.getApiHeaders());
+      this.set("setVolumeBody", { volume: volume });
+      this.$.setVolume
+        .generateRequest()
+        .completes.then(request => {
+          let state = request.response;
+          resolve(this._formatState(state));
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+  addToQueue(track) {
+    return new Promise((resolve, reject) => {
+      this.set("headers", apiHelper.getApiHeaders());
+      this.set("addToQueueBody", { track: track });
+      this.$.addToQueue
         .generateRequest()
         .completes.then(request => {
           let state = request.response;

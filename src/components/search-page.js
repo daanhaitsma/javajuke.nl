@@ -82,12 +82,21 @@ class SearchPage extends PolymerElement {
           max-width: 328px;
           margin: 8px auto 0px auto;
         }
+        .search-icon {
+          color: #757575;
+          transition: color 0.2s ease;
+        }
+        paper-input[focused] > iron-icon.search-icon {
+          color: var(--active-color);
+        }
       </style>
       <paper-input
         class="search"
         type="text"
         label="Search"
         value="{{searchQuery}}"
+      >
+        <iron-icon class="search-icon" slot="prefix" icon="search"></iron-icon
       ></paper-input>
       <div class="content-grid">
         <template is="dom-repeat" items="[[searchTracks]]" as="track">
@@ -101,7 +110,7 @@ class SearchPage extends PolymerElement {
               data-action="play"
               data-track$="[[track.id]]"
               class="track-card-disc"
-              src="[[_getCoverArt(track.art)]]"
+              src="[[_getCoverArt(track.album.coverPath)]]"
               alt=""
             />
             <div
@@ -112,7 +121,7 @@ class SearchPage extends PolymerElement {
               <p
                 data-action="play"
                 data-track$="[[track.id]]"
-                class$="track-title[[_active(track.id, player.track.id)]]"
+                class$="track-title[[_active(track.id, state.currentTrack.id)]]"
               >
                 [[track.title]]
               </p>
@@ -188,7 +197,7 @@ class SearchPage extends PolymerElement {
         observer: "_activeChanged"
       },
       user: Object,
-      player: Object,
+      state: Object,
       searchTracks: Array,
       playlists: {
         type: Array,
@@ -231,7 +240,10 @@ class SearchPage extends PolymerElement {
   }
 
   _getCoverArt(coverArt) {
-    return coverArt || "../../assets/images/icons/default_cover_art.svg";
+    return (
+      `../../assets/uploads/albumcover/${coverArt}` ||
+      "../../assets/images/icons/default_cover_art.svg"
+    );
   }
 
   _onDown(e) {
@@ -286,12 +298,12 @@ class SearchPage extends PolymerElement {
     switch (e.target.dataset.action) {
       case "play":
         if (
-          (this.player.track &&
-            this.player.track.id !== Number(e.target.dataset.track)) ||
-          !this.player.track
+          (this.state.currentTrack &&
+            this.state.currentTrack.id !== Number(e.target.dataset.track)) ||
+          !this.state.currentTrack
         ) {
           window.dispatchEvent(
-            new CustomEvent("set-track", {
+            new CustomEvent("add-to-queue", {
               detail: {
                 track: this.searchTracks.find(item => {
                   return item.id === Number(e.target.dataset.track);
@@ -300,9 +312,6 @@ class SearchPage extends PolymerElement {
             })
           );
         }
-        // window.dispatchEvent(
-        //   new CustomEvent("set-path", { detail: { path: "/player" } })
-        // );
         break;
       case "options":
         let track = this.searchTracks.find(item => {

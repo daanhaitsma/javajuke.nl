@@ -86,34 +86,93 @@ class PlayerPage extends PolymerElement {
         .icon-button.active {
           color: var(--active-color);
         }
+
+        .volume {
+          position: fixed;
+          top: 16px;
+          right: 16px;
+        }
+
+        .set-volume {
+          position: relative;
+          margin: 8px calc(50% - 64px) 0px calc(50% - 64px);
+          width: 128px;
+          height: 32px;
+          line-height: 32px;
+          text-align: center;
+          font-weight: 600;
+          color: white;
+          border-radius: 16px;
+          background-color: var(--active-color);
+          box-shadow: var(--box-shadow);
+          transition: box-shadow 0.2s ease;
+        }
+        .set-volume:active {
+          box-shadow: var(--box-shadow-active);
+        }
+        .volume-slider {
+          margin-top: 8px;
+          width: 100%;
+        }
+
+        .slider {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 100%;
+          height: 16px;
+          border-radius: 8px;
+          background: #eee;
+          outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: var(--active-color);
+          cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: var(--active-color);
+          cursor: pointer;
+        }
       </style>
       <div class="content-grid">
-        <img class="disc" src="[[_getCoverArt(player.track.art)]]" />
+        <img
+          class="disc"
+          src="[[_getCoverArt(state.currentTrack.album.coverPath)]]"
+        />
         <div class="info">
-          <p class="title">[[player.track.title]]</p>
-          <p class="subtitle">[[player.track.artist]]</p>
+          <p class="title">[[state.currentTrack.title]]</p>
+          <p class="subtitle">[[state.currentTrack.artist]]</p>
           <div class="progress-container">
-            <div class="time">
-              [[_convertTime(player.state.position)]]
-            </div>
+            <div class="time">[[_convertTime(state.position)]]</div>
             <div id="progress" class="progress-bar-container">
               <div class="progress-bar">
                 <div
-                  class$="progress[[_active(player.state.playing)]]"
-                  style$="width: [[_getProgress(player.state.position, player.track.duration)]]%;"
+                  class$="progress[[_active(state.playing)]]"
+                  style$="width: [[_getProgress(state.position, state.currentTrack.duration)]]%;"
                 ></div>
               </div>
             </div>
-            <div class="time">[[_convertTime(player.track.duration)]]</div>
+            <div class="time">
+              [[_convertTime(state.currentTrack.duration)]]
+            </div>
           </div>
           <div class="controls">
             <button
-              class$="icon-button[[_active(player.state.shuffle)]]"
+              class$="icon-button[[_active(state.shuffle)]]"
               on-click="_shuffle"
             >
               <iron-icon icon="shuffle"></iron-icon>
               <paper-ripple
-                class$="ripple[[_active(player.state.shuffle)]]"
+                class$="ripple[[_active(state.shuffle)]]"
                 center
               ></paper-ripple>
             </button>
@@ -122,7 +181,7 @@ class PlayerPage extends PolymerElement {
               <paper-ripple center></paper-ripple>
             </button>
             <button class="fab play" on-click="_playPause">
-              <iron-icon icon$="[[_getIcon(player.state.paused)]]"></iron-icon>
+              <iron-icon icon$="[[_getIcon(state.paused)]]"></iron-icon>
               <paper-ripple center></paper-ripple>
             </button>
             <button class="fab" on-click="_nextTrack">
@@ -130,18 +189,42 @@ class PlayerPage extends PolymerElement {
               <paper-ripple center></paper-ripple>
             </button>
             <button
-              class$="icon-button[[_active(player.state.repeat)]]"
+              class$="icon-button[[_active(state.repeat)]]"
               on-click="_repeat"
             >
               <iron-icon icon="repeat"></iron-icon>
               <paper-ripple
-                class$="ripple[[_active(player.state.repeat)]]"
+                class$="ripple[[_active(state.repeat)]]"
                 center
               ></paper-ripple>
             </button>
           </div>
         </div>
       </div>
+      <button class="icon-button volume" on-click="_volume">
+        <iron-icon icon="volume"></iron-icon>
+        <paper-ripple class="ripple active" center></paper-ripple>
+      </button>
+      <template is="dom-if" if="[[volumeControl]]">
+        <div data-action="close" class="overlay" on-click="_modalClick">
+          <div class="card card-modal">
+            <div class="modal-input-content">
+              <p class="modal-title">Volume Control</p>
+              <div class="volume-slider">
+                <input
+                  id="volume"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value="[[state.volume]]"
+                  class="slider"
+                  on-change="_volumeChange"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
     `;
   }
   static get properties() {
@@ -150,12 +233,17 @@ class PlayerPage extends PolymerElement {
         type: Boolean,
         observer: "_activeChanged"
       },
-      player: Object
+      state: Object,
+      volumeControl: {
+        type: Boolean,
+        value: false
+      },
+      volume: Number
     };
   }
 
   static get observers() {
-    return ["_trackChanged(player.track)"];
+    return ["_trackChanged(state.currentTrack)"];
   }
 
   _activeChanged(active) {
@@ -199,7 +287,10 @@ class PlayerPage extends PolymerElement {
   }
 
   _getCoverArt(coverArt) {
-    return coverArt || "../../assets/images/icons/default_cover_art.svg";
+    return (
+      `../../assets/uploads/albumcover/${coverArt}` ||
+      "../../assets/images/icons/default_cover_art.svg"
+    );
   }
 
   _shuffle() {
@@ -232,6 +323,29 @@ class PlayerPage extends PolymerElement {
         detail: { state: "playing" }
       })
     );
+  }
+
+  _volume() {
+    this.set("volumeControl", true);
+  }
+
+  _volumeChange(e) {
+    console.log(e.target.value);
+    window.dispatchEvent(
+      new CustomEvent("set-volume", {
+        detail: { volume: e.target.value }
+      })
+    );
+  }
+
+  _modalClick(e) {
+    if (e.target.dataset.action) {
+      switch (e.target.dataset.action) {
+        case "close":
+          this.set("volumeControl", false);
+          break;
+      }
+    }
   }
 }
 

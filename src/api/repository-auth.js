@@ -45,8 +45,8 @@ class RepositoryAuth extends PolymerElement {
         type: String,
         value: apiHelper.getUserUrl()
       },
-      registerBody: String,
-      loginBody: String,
+      registerBody: Object,
+      loginBody: Object,
       headers: {
         type: Object,
         value: apiHelper.getApiHeaders()

@@ -76,9 +76,45 @@ class TracksPage extends PolymerElement {
           align-self: center;
           justify-self: center;
         }
+        .upload-track {
+          position: relative;
+          margin: 8px calc(50% - 64px) 0px calc(50% - 64px);
+          width: 128px;
+          height: 32px;
+          line-height: 32px;
+          text-align: center;
+          font-weight: 600;
+          color: white;
+          border-radius: 16px;
+          background-color: var(--active-color);
+          box-shadow: var(--box-shadow);
+          transition: box-shadow 0.2s ease;
+        }
+        .upload-track:active {
+          box-shadow: var(--box-shadow-active);
+        }
+        .track-input {
+          display: inherit;
+          width: 0.1px;
+          height: 0.1px;
+          opacity: 0;
+        }
+        .track-input-label {
+          display: inline-block;
+          cursor: pointer;
+          width: 100%;
+          height: 48px;
+          margin-top: 8px;
+          border-radius: 4px;
+          line-height: 48px;
+          text-align: center;
+          color: white;
+          background-color: var(--active-color);
+          box-shadow: var(--box-shadow);
+        }
       </style>
       <button class="add-new" on-click="_addTrack">
-        Add<paper-ripple></paper-ripple>
+        Upload<paper-ripple></paper-ripple>
       </button>
       <div class="content-grid">
         <template is="dom-repeat" items="[[tracks]]" as="track">
@@ -92,7 +128,7 @@ class TracksPage extends PolymerElement {
               data-action="play"
               data-track$="[[track.id]]"
               class="track-card-disc"
-              src="[[_getCoverArt(track.art)]]"
+              src="[[_getCoverArt(track.album.coverPath)]]"
               alt=""
             />
             <div
@@ -103,7 +139,7 @@ class TracksPage extends PolymerElement {
               <p
                 data-action="play"
                 data-track$="[[track.id]]"
-                class$="track-title[[_active(track.id, player.track.id)]]"
+                class$="track-title[[_active(track.id, state.currentTrack.id)]]"
               >
                 [[track.title]]
               </p>
@@ -170,6 +206,38 @@ class TracksPage extends PolymerElement {
           </div>
         </div>
       </template>
+      <template is="dom-if" if="[[add]]">
+        <div data-action="close" class="overlay" on-click="_modalClick">
+          <div class="card card-modal">
+            <div class="modal-input-content">
+              <p class="modal-title">Upload Tracks</p>
+              <input
+                class="track-input"
+                type="file"
+                name="tracks"
+                id="tracks"
+                multiple
+                accept="audio/mpeg"
+                on-change="_filesChanged"
+              />
+              <template is="dom-if" if="[[!files.length]]">
+                <label class="track-input-label" for="tracks">
+                  <iron-icon icon="file"></iron-icon> Choose files
+                </label>
+              </template>
+              <template is="dom-if" if="[[files.length]]">
+                <label class="track-input-label" for="tracks">
+                  <iron-icon icon="file"></iron-icon> [[files.length]] files
+                  selected
+                </label>
+              </template>
+              <button data-action="uploadTracks" class="upload-track">
+                Upload<paper-ripple></paper-ripple>
+              </button>
+            </div>
+          </div>
+        </div>
+      </template>
     `;
   }
   static get properties() {
@@ -178,12 +246,20 @@ class TracksPage extends PolymerElement {
         type: Boolean,
         observer: "_activeChanged"
       },
+      add: {
+        type: Boolean,
+        value: false
+      },
       user: Object,
-      player: Object,
+      state: Object,
       tracks: Array,
       playlists: {
         type: Array,
         observer: "_playlistsChanged"
+      },
+      files: {
+        type: FileList,
+        value: []
       },
       yourPlaylists: Array,
       optionsTrack: Object,
@@ -213,7 +289,7 @@ class TracksPage extends PolymerElement {
   }
 
   _getCoverArt(coverArt) {
-    return coverArt || "../../assets/images/icons/default_cover_art.svg";
+    return `../../assets/uploads/albumcover/${coverArt}` || "../../assets/images/icons/default_cover_art.svg";
   }
 
   _onDown(e) {
@@ -222,7 +298,11 @@ class TracksPage extends PolymerElement {
   }
 
   _addTrack() {
-    console.log("TODO: Add Track");
+    this.set("add", true);
+  }
+
+  _filesChanged(e) {
+    this.set("files", e.target.files);
   }
 
   _modalClick(e) {
@@ -248,6 +328,7 @@ class TracksPage extends PolymerElement {
         case "close":
           this.set("optionsTrack", null);
           this.set("playlistTrack", null);
+          this.set("add", false);
           break;
         case "selectPlaylist":
           window.dispatchEvent(
@@ -260,6 +341,14 @@ class TracksPage extends PolymerElement {
           );
           this.set("playlistTrack", null);
           break;
+        case "uploadTracks":
+          window.dispatchEvent(
+            new CustomEvent("upload-tracks", {
+              detail: { files: this.get("files") }
+            })
+          );
+          this.set("add", false);
+          break;
       }
     }
   }
@@ -268,12 +357,12 @@ class TracksPage extends PolymerElement {
     switch (e.target.dataset.action) {
       case "play":
         if (
-          (this.player.track &&
-            this.player.track.id !== Number(e.target.dataset.track)) ||
-          !this.player.track
+          (this.state.currentTrack &&
+            this.state.currentTrack.id !== Number(e.target.dataset.track)) ||
+          !this.state.currentTrack
         ) {
           window.dispatchEvent(
-            new CustomEvent("set-track", {
+            new CustomEvent("add-to-queue", {
               detail: {
                 track: this.tracks.find(item => {
                   return item.id === Number(e.target.dataset.track);
@@ -282,9 +371,6 @@ class TracksPage extends PolymerElement {
             })
           );
         }
-        // window.dispatchEvent(
-        //   new CustomEvent("set-path", { detail: { path: "/player" } })
-        // );
         break;
       case "options":
         let track = this.tracks.find(item => {

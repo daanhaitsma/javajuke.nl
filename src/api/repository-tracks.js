@@ -23,6 +23,14 @@ class RepositoryTracks extends PolymerElement {
       >
       </iron-ajax>
       <iron-ajax
+        id="uploadTracks"
+        method="POST"
+        body="[[uploadTracksBody]]"
+        url="[[uploadTracksUrl]]"
+        headers="[[headers]]"
+      >
+      </iron-ajax>
+      <iron-ajax
         id="getTrack"
         method="GET"
         url="[[getTrackUrl]]"
@@ -50,9 +58,14 @@ class RepositoryTracks extends PolymerElement {
         type: String,
         value: apiHelper.searchTracksUrl()
       },
+      uploadTracksUrl: {
+        type: String,
+        value: apiHelper.uploadTracksUrl()
+      },
       getTrackUrl: String,
       deleteTrackUrl: String,
       searchTracksParams: Object,
+      uploadTracksBody: Object,
       headers: {
         type: Object,
         value: apiHelper.getApiHeaders()
@@ -63,6 +76,25 @@ class RepositoryTracks extends PolymerElement {
     return new Promise((resolve, reject) => {
       this.set("headers", apiHelper.getApiHeaders());
       this.$.getTracks
+        .generateRequest()
+        .completes.then(request => {
+          let tracks = request.response.data;
+          resolve(tracks);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+  uploadTracks(files) {
+    return new Promise((resolve, reject) => {
+      let formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i]);
+      }
+      this.set("headers", apiHelper.getApiHeaders());
+      this.set("uploadTracksBody", formData);
+      this.$.uploadTracks
         .generateRequest()
         .completes.then(request => {
           let tracks = request.response.data;

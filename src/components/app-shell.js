@@ -68,16 +68,8 @@ class AppShell extends PolymerElement {
           attr-for-selected="name"
           fallback-selection="404"
         >
-          <player-page
-            name="player"
-            state="[[state]]"
-            active="[[_isActive(page, 'player')]]"
-          ></player-page>
-          <home-page
-            name="home"
-            state="[[state]]"
-            active="[[_isActive(page, 'home')]]"
-          ></home-page>
+          <player-page name="player" state="[[state]]"></player-page>
+          <home-page name="home" state="[[state]]"></home-page>
           <tracks-page
             name="tracks"
             user="[[user]]"
@@ -107,12 +99,9 @@ class AppShell extends PolymerElement {
             playlist="[[playlist]]"
             user="[[user]]"
             route="[[subroute]]"
-            active="[[_isActive(page, 'playlist')]]"
           ></playlist-page>
-          <login-page
-            name="login"
-            active="[[_isActive(page, 'login')]]"
-          ></login-page>
+          <settings-page name="settings"></settings-page>
+          <login-page name="login"></login-page>
           <div name="404">404</div>
         </iron-pages>
         <bottom-bar page="[[routeData.page]]" state="[[state]]"></bottom-bar>
@@ -220,7 +209,7 @@ class AppShell extends PolymerElement {
       this._uploadTracks(e.detail.files)
     );
     window.addEventListener("delete-track", e =>
-      this._deleteTrack(e.detail.track)
+      this._deleteTrack(e.detail.track, e.detail.search)
     );
     window.addEventListener("get-playlists", () => this._getPlaylists());
     window.addEventListener("create-playlist", e =>
@@ -290,6 +279,9 @@ class AppShell extends PolymerElement {
         break;
       case "playlist":
         import("./playlist-page.js");
+        break;
+      case "settings":
+        import("./settings-page.js");
         break;
       case "login":
         import("./login-page.js");
@@ -411,10 +403,14 @@ class AppShell extends PolymerElement {
       });
   }
 
-  _deleteTrack(track) {
+  _deleteTrack(track, search) {
+    console.log(search);
     this.$.repositoryTracks
       .deleteTrack(track)
       .then(() => {
+        if (search !== undefined) {
+          this._searchTracks(search);
+        }
         this._getTracks();
         this.set("successToastMessage", "Track was successfully deleted");
         this.$.successToast.open();

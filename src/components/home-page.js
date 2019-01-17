@@ -1,7 +1,5 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/polymer/lib/elements/dom-repeat.js";
-import "@polymer/paper-ripple/paper-ripple.js";
-import "../../assets/images/icons/icon-set.js";
 import "../style/shared-styles.js";
 
 class HomePage extends PolymerElement {
@@ -102,19 +100,9 @@ class HomePage extends PolymerElement {
   }
   static get properties() {
     return {
-      active: {
-        type: Boolean,
-        observer: "_activeChanged"
-      },
       user: Object,
       state: Object
     };
-  }
-
-  _activeChanged(active) {
-    if (active) {
-      console.log(active);
-    }
   }
 
   _active(track, activeTrack) {

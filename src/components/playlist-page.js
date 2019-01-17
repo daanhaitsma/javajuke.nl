@@ -193,10 +193,6 @@ class PlaylistPage extends PolymerElement {
     return {
       route: Object,
       routeData: Object,
-      active: {
-        type: Boolean,
-        observer: "_activeChanged"
-      },
       user: Object,
       state: Object,
       playlist: Object,
@@ -218,12 +214,6 @@ class PlaylistPage extends PolymerElement {
           }
         })
       );
-    }
-  }
-
-  _activeChanged(active) {
-    if (active) {
-      console.log(active);
     }
   }
 

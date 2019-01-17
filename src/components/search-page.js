@@ -216,7 +216,15 @@ class SearchPage extends PolymerElement {
 
   _activeChanged(active) {
     if (active) {
-      this.set("searchQuery", "");
+      if (this.get("searchQuery") === "") {
+        window.dispatchEvent(
+          new CustomEvent("search-tracks", {
+            detail: { search: "" }
+          })
+        );
+      } else {
+        this.set("searchQuery", "");
+      }
     }
   }
 
@@ -270,7 +278,10 @@ class SearchPage extends PolymerElement {
         case "deleteTrack":
           window.dispatchEvent(
             new CustomEvent("delete-track", {
-              detail: { track: this.get("optionsTrack").id }
+              detail: {
+                track: this.get("optionsTrack").id,
+                search: this.get("searchQuery")
+              }
             })
           );
           this.set("optionsTrack", null);

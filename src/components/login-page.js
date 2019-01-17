@@ -1,7 +1,6 @@
 import { html, PolymerElement } from "@polymer/polymer/polymer-element.js";
 import "@polymer/paper-ripple/paper-ripple.js";
 import "@polymer/paper-input/paper-input.js";
-import "../../assets/images/icons/icon-set.js";
 import "../style/shared-styles.js";
 
 class LoginPage extends PolymerElement {
@@ -84,19 +83,9 @@ class LoginPage extends PolymerElement {
   }
   static get properties() {
     return {
-      active: {
-        type: Boolean,
-        observer: "_activeChanged"
-      },
       username: String,
       password: String
     };
-  }
-
-  _activeChanged(active) {
-    if (active) {
-      console.log(active);
-    }
   }
 
   _login() {

@@ -229,10 +229,6 @@ class PlayerPage extends PolymerElement {
   }
   static get properties() {
     return {
-      active: {
-        type: Boolean,
-        observer: "_activeChanged"
-      },
       state: Object,
       volumeControl: {
         type: Boolean,
@@ -244,12 +240,6 @@ class PlayerPage extends PolymerElement {
 
   static get observers() {
     return ["_trackChanged(state.currentTrack)"];
-  }
-
-  _activeChanged(active) {
-    if (active) {
-      console.log(active);
-    }
   }
 
   _trackChanged(track) {

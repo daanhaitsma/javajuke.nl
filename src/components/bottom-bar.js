@@ -192,11 +192,7 @@ class BottomBar extends PolymerElement {
           >
             <iron-icon data-path="/tracks" icon="track"></iron-icon>
             <p data-path="/tracks" class="bottom-bar-title">Tracks</p>
-            <paper-ripple
-              data-path="/tracks"
-              class="ripple"
-              center
-            ></paper-ripple>
+            <paper-ripple class="ripple" center></paper-ripple>
           </div>
           <div
             class$="bottom-bar-button[[_activePage('playlists', page)]]"
@@ -205,11 +201,7 @@ class BottomBar extends PolymerElement {
           >
             <iron-icon data-path="/playlists" icon="folder"></iron-icon>
             <p data-path="/playlists" class="bottom-bar-title">Playlists</p>
-            <paper-ripple
-              data-path="/playlists"
-              class="ripple"
-              center
-            ></paper-ripple>
+            <paper-ripple class="ripple" center></paper-ripple>
           </div>
           <div
             class$="bottom-bar-button[[_activePage('search', page)]]"
@@ -218,15 +210,15 @@ class BottomBar extends PolymerElement {
           >
             <iron-icon data-path="/search" icon="search"></iron-icon>
             <p data-path="/search" class="bottom-bar-title">Search</p>
-            <paper-ripple
-              data-path="/search"
-              class="ripple"
-              center
-            ></paper-ripple>
+            <paper-ripple class="ripple" center></paper-ripple>
           </div>
-          <div class$="bottom-bar-button[[_activePage('account, page')]]">
-            <iron-icon icon="account"></iron-icon>
-            <p class="bottom-bar-title">Account</p>
+          <div
+            class$="bottom-bar-button[[_activePage('settings', page)]]"
+            data-path="/settings"
+            on-click="_navigate"
+          >
+            <iron-icon data-path="/settings" icon="settings"></iron-icon>
+            <p data-path="/settings" class="bottom-bar-title">Settings</p>
             <paper-ripple class="ripple" center></paper-ripple>
           </div>
         </div>
@@ -262,7 +254,10 @@ class BottomBar extends PolymerElement {
   }
 
   _getCoverArt(coverArt) {
-    return `../../assets/uploads/albumcover/${coverArt}` || "../../assets/images/icons/default_cover_art.svg";
+    return (
+      `../../assets/uploads/albumcover/${coverArt}` ||
+      "../../assets/images/icons/default_cover_art.svg"
+    );
   }
 
   _active(active) {
@@ -285,7 +280,7 @@ class BottomBar extends PolymerElement {
   _navigate(e) {
     window.dispatchEvent(
       new CustomEvent("set-path", {
-        detail: { path: e.target.dataset.path, history: ["/tracks"] }
+        detail: { path: e.target.dataset.path, history: ["/home"] }
       })
     );
   }

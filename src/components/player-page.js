@@ -230,6 +230,7 @@ class PlayerPage extends PolymerElement {
   static get properties() {
     return {
       state: Object,
+      active: Boolean,
       volumeControl: {
         type: Boolean,
         value: false

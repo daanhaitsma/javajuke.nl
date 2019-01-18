@@ -68,7 +68,11 @@ class AppShell extends PolymerElement {
           attr-for-selected="name"
           fallback-selection="404"
         >
-          <player-page name="player" state="[[state]]"></player-page>
+          <player-page
+            name="player"
+            state="[[state]]"
+            active="[[_isActive(page, 'player')]]"
+          ></player-page>
           <home-page name="home" state="[[state]]"></home-page>
           <tracks-page
             name="tracks"

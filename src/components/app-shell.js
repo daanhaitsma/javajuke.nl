@@ -101,7 +101,14 @@ class AppShell extends PolymerElement {
             route="[[subroute]]"
           ></playlist-page>
           <settings-page name="settings"></settings-page>
-          <login-page name="login"></login-page>
+          <login-page
+            name="login"
+            active="[[_isActive(page, 'login')]]"
+          ></login-page>
+          <register-page
+            name="register"
+            active="[[_isActive(page, 'register')]]"
+          ></register-page>
           <div name="404">404</div>
         </iron-pages>
         <bottom-bar page="[[routeData.page]]" state="[[state]]"></bottom-bar>
@@ -137,7 +144,19 @@ class AppShell extends PolymerElement {
         type: Boolean,
         value: false
       },
-      state: Object,
+      state: {
+        type: Object,
+        value: {
+          position: 0,
+          volume: 100,
+          shuffle: false,
+          repeat: false,
+          playing: false,
+          paused: false,
+          currentTrack: null,
+          trackList: []
+        }
+      },
       tracks: Array,
       playlists: Array,
       playlist: Object,
@@ -153,7 +172,8 @@ class AppShell extends PolymerElement {
   static get observers() {
     return [
       "_routePageChanged(routeData.page)",
-      "_playingChanged(state.playing)"
+      "_playingChanged(state.playing)",
+      "_userChanged(user)"
     ];
   }
 
@@ -174,13 +194,6 @@ class AppShell extends PolymerElement {
     addOfflineListener(offline => {
       this.set("offline", offline);
     });
-
-    this.set(
-      "stateInterval",
-      setInterval(() => {
-        this._getState();
-      }, 2000)
-    );
 
     window.addEventListener("set-path", e =>
       this._setPath(e.detail.path, e.detail.history)
@@ -211,6 +224,7 @@ class AppShell extends PolymerElement {
     window.addEventListener("delete-track", e =>
       this._deleteTrack(e.detail.track, e.detail.search)
     );
+    window.addEventListener("sync-tracks", () => this._syncTracks());
     window.addEventListener("get-playlists", () => this._getPlaylists());
     window.addEventListener("create-playlist", e =>
       this._createPlaylist(e.detail.name)
@@ -230,6 +244,10 @@ class AppShell extends PolymerElement {
     window.addEventListener("login-user", e =>
       this._login(e.detail.username, e.detail.password)
     );
+    window.addEventListener("register-user", e =>
+      this._register(e.detail.username, e.detail.email, e.detail.password)
+    );
+    window.addEventListener("logout-user", () => this._logout());
   }
 
   _closeSuccessToast() {
@@ -251,6 +269,20 @@ class AppShell extends PolymerElement {
       );
     } else {
       clearInterval(this.playerInterval);
+    }
+  }
+
+  _userChanged(user) {
+    if (user) {
+      clearInterval(this.stateInterval);
+      this.set(
+        "stateInterval",
+        setInterval(() => {
+          this._getState();
+        }, 2000)
+      );
+    } else {
+      clearInterval(this.stateInterval);
     }
   }
 
@@ -283,6 +315,9 @@ class AppShell extends PolymerElement {
       case "settings":
         import("./settings-page.js");
         break;
+      case "register":
+        import("./register-page.js");
+        break;
       case "login":
         import("./login-page.js");
         break;
@@ -312,62 +347,189 @@ class AppShell extends PolymerElement {
     }
   }
 
+  _logout() {
+    this.set("user", null);
+    cookieHelper.removeCookie("auth_token");
+    this.$.repositoryAuth.logout();
+    this._setPath(`/login`, []);
+  }
+
   _addToQueue(track) {
-    this.$.repositoryPlayer.addToQueue(track.id).then(result => {
-      this.set("state", result);
-      this.set("successToastMessage", "Track was successfully added to queue");
-      this.$.successToast.open();
-    });
+    this.$.repositoryPlayer
+      .addToQueue(track.id)
+      .then(result => {
+        this.set("state", result);
+        this.set(
+          "successToastMessage",
+          "Track was successfully added to queue"
+        );
+        this.$.successToast.open();
+      })
+      .catch(error => {
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
+      });
   }
 
   _getState() {
-    this.$.repositoryPlayer.getState().then(result => {
-      this.set("state", result);
-    });
+    this.$.repositoryPlayer
+      .getState()
+      .then(result => {
+        this.set("state", result);
+      })
+      .catch(error => {
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
+      });
   }
 
   _setVolume(volume) {
-    this.$.repositoryPlayer.setVolume(volume).then(result => {
-      this.set("state", result);
-    });
+    this.$.repositoryPlayer
+      .setVolume(volume)
+      .then(result => {
+        this.set("state", result);
+      })
+      .catch(error => {
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
+      });
   }
 
   _toggleState(state) {
     switch (state) {
       case "playing":
-        this.$.repositoryPlayer.togglePlay().then(result => {
-          this.set("state", result);
-        });
+        this.$.repositoryPlayer
+          .togglePlay()
+          .then(result => {
+            this.set("state", result);
+          })
+          .catch(error => {
+            if (error.response) {
+              switch (error.response.code) {
+                case 401:
+                  this._logout();
+                  break;
+              }
+            } else {
+              this._logout();
+            }
+          });
         break;
       case "shuffle":
-        this.$.repositoryPlayer.toggleShuffle().then(result => {
-          this.set("state", result);
-        });
+        this.$.repositoryPlayer
+          .toggleShuffle()
+          .then(result => {
+            this.set("state", result);
+          })
+          .catch(error => {
+            if (error.response) {
+              switch (error.response.code) {
+                case 401:
+                  this._logout();
+                  break;
+              }
+            } else {
+              this._logout();
+            }
+          });
         break;
       case "repeat":
-        this.$.repositoryPlayer.toggleRepeat().then(result => {
-          this.set("state", result);
-        });
+        this.$.repositoryPlayer
+          .toggleRepeat()
+          .then(result => {
+            this.set("state", result);
+          })
+          .catch(error => {
+            if (error.response) {
+              switch (error.response.code) {
+                case 401:
+                  this._logout();
+                  break;
+              }
+            } else {
+              this._logout();
+            }
+          });
         break;
     }
   }
 
   _previousTrack() {
-    this.$.repositoryPlayer.previousTrack().then(result => {
-      this.set("state", result);
-    });
+    this.$.repositoryPlayer
+      .previousTrack()
+      .then(result => {
+        this.set("state", result);
+      })
+      .catch(error => {
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
+      });
   }
 
   _nextTrack() {
-    this.$.repositoryPlayer.nextTrack().then(result => {
-      this.set("state", result);
-    });
+    this.$.repositoryPlayer
+      .nextTrack()
+      .then(result => {
+        this.set("state", result);
+      })
+      .catch(error => {
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
+      });
   }
 
   _playPlaylist(playlist) {
-    this.$.repositoryPlayer.playPlaylist(playlist).then(result => {
-      this.set("state", result);
-    });
+    this.$.repositoryPlayer
+      .playPlaylist(playlist)
+      .then(result => {
+        this.set("state", result);
+      })
+      .catch(error => {
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
+      });
   }
 
   _getTracks() {
@@ -377,7 +539,15 @@ class AppShell extends PolymerElement {
         this.set("tracks", result);
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -388,7 +558,35 @@ class AppShell extends PolymerElement {
         this._getTracks();
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
+      });
+  }
+
+  _syncTracks() {
+    this.$.repositoryTracks
+      .syncTracks()
+      .then(() => {
+        this.set("successToastMessage", "Track where successfully synced");
+        this.$.successToast.open();
+      })
+      .catch(error => {
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -399,12 +597,19 @@ class AppShell extends PolymerElement {
         this.set("searchTracks", result);
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
   _deleteTrack(track, search) {
-    console.log(search);
     this.$.repositoryTracks
       .deleteTrack(track)
       .then(() => {
@@ -416,7 +621,15 @@ class AppShell extends PolymerElement {
         this.$.successToast.open();
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -427,7 +640,15 @@ class AppShell extends PolymerElement {
         this.set("playlists", result);
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -438,7 +659,15 @@ class AppShell extends PolymerElement {
         this._setPath(`/playlist/${result.id}`);
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -449,7 +678,15 @@ class AppShell extends PolymerElement {
         this.set("playlist", result);
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -462,7 +699,15 @@ class AppShell extends PolymerElement {
         this.$.successToast.open();
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -478,7 +723,15 @@ class AppShell extends PolymerElement {
         this.$.successToast.open();
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -493,9 +746,19 @@ class AppShell extends PolymerElement {
         this.$.successToast.open();
       })
       .catch(error => {
-        this.set("errorToastMessage", "Track already exists in playlist");
-        this.$.errorToast.open();
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 400:
+              this.set("errorToastMessage", "Track already exists in playlist");
+              this.$.errorToast.open();
+              break;
+            case 401:
+              this._logout();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -508,7 +771,36 @@ class AppShell extends PolymerElement {
         this._setPath("/home", []);
       })
       .catch(error => {
-        console.log(error);
+        if (error.response) {
+          switch (error.response.code) {
+            case 404:
+              this.set("errorToastMessage", "Incorrect login credentials");
+              this.$.errorToast.open();
+              break;
+          }
+        } else {
+          this._logout();
+        }
+      });
+  }
+
+  _register(username, email, password) {
+    this.$.repositoryAuth
+      .register(email, username, password)
+      .then(result => {
+        this._setPath("/login", []);
+      })
+      .catch(error => {
+        if (error.response) {
+          switch (error.response.code) {
+            case 404:
+              this.set("errorToastMessage", "Username of email already in use");
+              this.$.errorToast.open();
+              break;
+          }
+        } else {
+          this._logout();
+        }
       });
   }
 
@@ -518,12 +810,18 @@ class AppShell extends PolymerElement {
         .getUser()
         .then(result => {
           this.set("user", result);
-          // this._setPath("/tracks", []);
+          this._setPath("/home", []);
         })
         .catch(error => {
-          console.log(error);
-          cookieHelper.removeCookie("auth_token");
-          this._setPath("/login", []);
+          if (error.response) {
+            switch (error.response.code) {
+              case 401:
+                this._logout();
+                break;
+            }
+          } else {
+            this._logout();
+          }
         });
     } else {
       this._setPath("/login", []);

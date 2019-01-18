@@ -114,64 +114,74 @@ class PlaylistPage extends PolymerElement {
       <div class="playlist-content">
         <p class="title">[[playlist.name]]</p>
         <p class="subtitle">by [[playlist.user.username]]</p>
-        <button class="playlist-play" on-click="_play">
-          PLAY<paper-ripple></paper-ripple>
-        </button>
+        <template is="dom-if" if="[[playlist.tracks.length]]">
+          <button class="playlist-play" on-click="_play">
+            PLAY<paper-ripple></paper-ripple>
+          </button>
+        </template>
       </div>
-      <div class="content-grid">
-        <template is="dom-repeat" items="[[playlist.tracks]]" as="track">
-          <div
-            data-action="play"
-            data-track$="[[track.id]]"
-            class$="card track-card[[_isYourPlaylist(user.id, playlist.user.id)]]"
-            on-click="_trackClick"
-          >
-            <img
-              data-action="play"
-              data-track$="[[track.id]]"
-              class="track-card-disc"
-              src="[[_getCoverArt(track.album.coverPath)]]"
-              alt=""
-            />
+      <template is="dom-if" if="[[playlist.tracks.length]]">
+        <div class="content-grid">
+          <template is="dom-repeat" items="[[playlist.tracks]]" as="track">
             <div
               data-action="play"
               data-track$="[[track.id]]"
-              class="track-card-content"
+              class$="card track-card[[_isYourPlaylist(user.id, playlist.user.id)]]"
+              on-click="_trackClick"
             >
-              <p
+              <img
                 data-action="play"
                 data-track$="[[track.id]]"
-                class$="track-title[[_active(track.id, state.currentTrack.id)]]"
-              >
-                [[track.title]]
-              </p>
-              <p
+                class="track-card-disc"
+                src="[[_getCoverArt(track.album.coverPath)]]"
+                alt=""
+              />
+              <div
                 data-action="play"
                 data-track$="[[track.id]]"
-                class="track-artist"
+                class="track-card-content"
               >
-                [[track.artist]]
-              </p>
-            </div>
-            <template is="dom-if" if="[[_equals(user.id, playlist.user.id)]]">
-              <button
-                data-action="options"
-                data-track$="[[track.id]]"
-                class="icon-button"
-                on-down="_onDown"
-              >
-                <iron-icon
+                <p
+                  data-action="play"
+                  data-track$="[[track.id]]"
+                  class$="track-title[[_active(track.id, state.currentTrack.id)]]"
+                >
+                  [[track.title]]
+                </p>
+                <p
+                  data-action="play"
+                  data-track$="[[track.id]]"
+                  class="track-artist"
+                >
+                  [[track.artist]]
+                </p>
+              </div>
+              <template is="dom-if" if="[[_equals(user.id, playlist.user.id)]]">
+                <button
                   data-action="options"
                   data-track$="[[track.id]]"
-                  icon="options"
-                ></iron-icon>
-                <paper-ripple center></paper-ripple>
-              </button>
-            </template>
-            <paper-ripple></paper-ripple>
-          </div>
-        </template>
-      </div>
+                  class="icon-button"
+                  on-down="_onDown"
+                >
+                  <iron-icon
+                    data-action="options"
+                    data-track$="[[track.id]]"
+                    icon="options"
+                  ></iron-icon>
+                  <paper-ripple center></paper-ripple>
+                </button>
+              </template>
+              <paper-ripple></paper-ripple>
+            </div>
+          </template>
+        </div>
+      </template>
+      <template is="dom-if" if="[[!playlist.tracks.length]]">
+        <div class="empty-list-container">
+          <iron-icon class="empty-list-icon" icon="track"></iron-icon>
+          <p class="empty-list-message">There are no tracks in this playlist yet</p>
+        </div>
+      </template>
       <template is="dom-if" if="[[selected]]">
         <div data-action="close" class="overlay" on-click="_modalClick">
           <div class="card card-modal">

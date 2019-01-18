@@ -77,25 +77,33 @@ class HomePage extends PolymerElement {
         }
       </style>
       <div class="page-header"><p class="title">Queue</p></div>
-      <div class="content-grid">
-        <template is="dom-repeat" items="[[state.trackList]]" as="track">
-          <div class="card track-card">
-            <img
-              class="track-card-disc"
-              src="[[_getCoverArt(track.album.coverPath)]]"
-              alt=""
-            />
-            <div class="track-card-content">
-              <p
-                class$="track-title[[_active(track.id, state.currentTrack.id)]]"
-              >
-                [[track.title]]
-              </p>
-              <p class="track-artist">[[track.artist]]</p>
+      <template is="dom-if" if="[[state.trackList.length]]">
+        <div class="content-grid">
+          <template is="dom-repeat" items="[[state.trackList]]" as="track">
+            <div class="card track-card">
+              <img
+                class="track-card-disc"
+                src="[[_getCoverArt(track.album.coverPath)]]"
+                alt=""
+              />
+              <div class="track-card-content">
+                <p
+                  class$="track-title[[_active(track.id, state.currentTrack.id)]]"
+                >
+                  [[track.title]]
+                </p>
+                <p class="track-artist">[[track.artist]]</p>
+              </div>
             </div>
-          </div>
-        </template>
-      </div>
+          </template>
+        </div>
+      </template>
+      <template is="dom-if" if="[[!state.trackList.length]]">
+        <div class="empty-list-container">
+          <iron-icon class="empty-list-icon" icon="track"></iron-icon>
+          <p class="empty-list-message">There are no tracks in queue yet</p>
+        </div>
+      </template>
     `;
   }
   static get properties() {

@@ -44,10 +44,10 @@ class SettingsPage extends PolymerElement {
       </style>
       <div class="page-header"><p class="title">Settings</p></div>
       <div class="content-grid">
-        <button class="settings-action">
+        <button class="settings-action" on-click="_scanFolder">
           Scan public folder<paper-ripple></paper-ripple>
         </button>
-        <button class="settings-action">
+        <button class="settings-action" on-click="_logout">
           Logout<paper-ripple></paper-ripple>
         </button>
       </div>
@@ -58,11 +58,19 @@ class SettingsPage extends PolymerElement {
   }
 
   _scanFolder() {
-    console.log("TODO: Scan Folder");
+    window.dispatchEvent(
+        new CustomEvent("sync-tracks", {
+          detail: {}
+        })
+      );
   }
 
-  _Logout() {
-    console.log("TODO: Logout");
+  _logout() {
+    window.dispatchEvent(
+      new CustomEvent("logout-user", {
+        detail: {}
+      })
+    );
   }
 }
 

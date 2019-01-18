@@ -11,6 +11,7 @@ class RepositoryAuth extends PolymerElement {
         content-type="application/x-www-form-urlencoded"
         body="[[registerBody]]"
         url="[[registerUrl]]"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -19,6 +20,16 @@ class RepositoryAuth extends PolymerElement {
         content-type="application/x-www-form-urlencoded"
         body="[[loginBody]]"
         url="[[loginUrl]]"
+        reject-with-request
+      >
+      </iron-ajax>
+      <iron-ajax
+        id="logout"
+        method="GET"
+        content-type="application/x-www-form-urlencoded"
+        url="[[logoutUrl]]"
+        headers="[[headers]]"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -27,6 +38,7 @@ class RepositoryAuth extends PolymerElement {
         content-type="application/x-www-form-urlencoded"
         url="[[getUserUrl]]"
         headers="[[headers]]"
+        reject-with-request
       >
       </iron-ajax>
     `;
@@ -40,6 +52,10 @@ class RepositoryAuth extends PolymerElement {
       loginUrl: {
         type: String,
         value: apiHelper.loginUrl()
+      },
+      logoutUrl: {
+        type: String,
+        value: apiHelper.logoutUrl()
       },
       getUserUrl: {
         type: String,
@@ -67,7 +83,7 @@ class RepositoryAuth extends PolymerElement {
           resolve(user);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -86,8 +102,32 @@ class RepositoryAuth extends PolymerElement {
           resolve(token);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
+    });
+  }
+  register(email, username, password) {
+    return new Promise((resolve, reject) => {
+      this.set("registerBody", {
+        email: email,
+        username: username,
+        password: password
+      });
+      this.$.register
+        .generateRequest()
+        .completes.then(request => {
+          let response = request.response;
+          resolve(response);
+        })
+        .catch(error => {
+          reject(error.request);
+        });
+    });
+  }
+  logout() {
+    return new Promise((resolve, reject) => {
+      this.set("headers", apiHelper.getApiHeaders());
+      this.$.logout.generateRequest();
     });
   }
   getUser() {
@@ -101,7 +141,7 @@ class RepositoryAuth extends PolymerElement {
           resolve(user);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }

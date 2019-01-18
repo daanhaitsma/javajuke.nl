@@ -3,15 +3,20 @@ import * as cookieHelper from "../utils/cookieHelper.js";
 let apiBaseUrl = "http://localhost:8080";
 
 export function getApiHeaders() {
-  return { "X-Authorization": cookieHelper.getCookie("auth_token") };
+  let authToken = cookieHelper.getCookie("auth_token") || "";
+  return { "X-Authorization": authToken };
 }
 
 export function registerUrl() {
   return `${apiBaseUrl}/register`;
 }
 
-export function loginUrl(id) {
+export function loginUrl() {
   return `${apiBaseUrl}/login`;
+}
+
+export function logoutUrl() {
+  return `${apiBaseUrl}/logout`;
 }
 
 export function getUserUrl() {
@@ -36,6 +41,10 @@ export function getTrackUrl(id) {
 
 export function deleteTrackUrl(id) {
   return `${apiBaseUrl}/tracks/${id}`;
+}
+
+export function syncTracksUrl() {
+  return `${apiBaseUrl}/tracks/sync`;
 }
 
 export function getPlaylistsUrl() {

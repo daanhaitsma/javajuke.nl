@@ -10,7 +10,7 @@ class RepositoryPlayer extends PolymerElement {
         method="GET"
         url="[[getStateUrl]]"
         headers="[[headers]]"
-        handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -20,6 +20,7 @@ class RepositoryPlayer extends PolymerElement {
         url="[[setVolumeUrl]]"
         body="[[setVolumeBody]]"
         headers="[[headers]]"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -29,6 +30,7 @@ class RepositoryPlayer extends PolymerElement {
         url="[[addToQueueUrl]]"
         body="[[addToQueueBody]]"
         headers="[[headers]]"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -37,6 +39,7 @@ class RepositoryPlayer extends PolymerElement {
         url="[[togglePlayUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -45,6 +48,7 @@ class RepositoryPlayer extends PolymerElement {
         url="[[toggleShuffleUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -53,6 +57,7 @@ class RepositoryPlayer extends PolymerElement {
         url="[[toggleRepeatUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -61,6 +66,7 @@ class RepositoryPlayer extends PolymerElement {
         url="[[nextTrackUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -69,6 +75,7 @@ class RepositoryPlayer extends PolymerElement {
         url="[[previousTrackUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -77,6 +84,7 @@ class RepositoryPlayer extends PolymerElement {
         url="[[playPlaylistUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
     `;
@@ -134,7 +142,7 @@ class RepositoryPlayer extends PolymerElement {
           resolve(this._formatState(state));
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -149,7 +157,7 @@ class RepositoryPlayer extends PolymerElement {
           resolve(this._formatState(state));
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -164,7 +172,7 @@ class RepositoryPlayer extends PolymerElement {
           resolve(this._formatState(state));
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -178,7 +186,7 @@ class RepositoryPlayer extends PolymerElement {
           resolve(this._formatState(state));
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -192,7 +200,7 @@ class RepositoryPlayer extends PolymerElement {
           resolve(this._formatState(state));
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -206,7 +214,7 @@ class RepositoryPlayer extends PolymerElement {
           resolve(this._formatState(state));
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -220,7 +228,7 @@ class RepositoryPlayer extends PolymerElement {
           resolve(this._formatState(state));
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -234,7 +242,7 @@ class RepositoryPlayer extends PolymerElement {
           resolve(this._formatState(state));
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -249,7 +257,7 @@ class RepositoryPlayer extends PolymerElement {
           resolve(this._formatState(state));
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }

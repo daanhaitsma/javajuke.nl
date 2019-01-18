@@ -116,58 +116,66 @@ class TracksPage extends PolymerElement {
       <button class="add-new" on-click="_addTrack">
         Upload<paper-ripple></paper-ripple>
       </button>
-      <div class="content-grid">
-        <template is="dom-repeat" items="[[tracks]]" as="track">
-          <div
-            data-action="play"
-            data-track$="[[track.id]]"
-            class="card track-card"
-            on-click="_trackClick"
-          >
-            <img
-              data-action="play"
-              data-track$="[[track.id]]"
-              class="track-card-disc"
-              src="[[_getCoverArt(track.album.coverPath)]]"
-              alt=""
-            />
+      <template is="dom-if" if="[[tracks.length]]">
+        <div class="content-grid">
+          <template is="dom-repeat" items="[[tracks]]" as="track">
             <div
               data-action="play"
               data-track$="[[track.id]]"
-              class="track-card-content"
+              class="card track-card"
+              on-click="_trackClick"
             >
-              <p
+              <img
                 data-action="play"
                 data-track$="[[track.id]]"
-                class$="track-title[[_active(track.id, state.currentTrack.id)]]"
-              >
-                [[track.title]]
-              </p>
-              <p
+                class="track-card-disc"
+                src="[[_getCoverArt(track.album.coverPath)]]"
+                alt=""
+              />
+              <div
                 data-action="play"
                 data-track$="[[track.id]]"
-                class="track-artist"
+                class="track-card-content"
               >
-                [[track.artist]]
-              </p>
-            </div>
-            <button
-              data-action="options"
-              data-track$="[[track.id]]"
-              class="icon-button"
-              on-down="_onDown"
-            >
-              <iron-icon
+                <p
+                  data-action="play"
+                  data-track$="[[track.id]]"
+                  class$="track-title[[_active(track.id, state.currentTrack.id)]]"
+                >
+                  [[track.title]]
+                </p>
+                <p
+                  data-action="play"
+                  data-track$="[[track.id]]"
+                  class="track-artist"
+                >
+                  [[track.artist]]
+                </p>
+              </div>
+              <button
                 data-action="options"
                 data-track$="[[track.id]]"
-                icon="options"
-              ></iron-icon>
-              <paper-ripple center></paper-ripple>
-            </button>
-            <paper-ripple></paper-ripple>
-          </div>
-        </template>
-      </div>
+                class="icon-button"
+                on-down="_onDown"
+              >
+                <iron-icon
+                  data-action="options"
+                  data-track$="[[track.id]]"
+                  icon="options"
+                ></iron-icon>
+                <paper-ripple center></paper-ripple>
+              </button>
+              <paper-ripple></paper-ripple>
+            </div>
+          </template>
+        </div>
+      </template>
+      <template is="dom-if" if="[[!tracks.length]]">
+        <div class="empty-list-container">
+          <iron-icon class="empty-list-icon" icon="track"></iron-icon>
+          <p class="empty-list-message">There are no tracks yet</p>
+        </div>
+      </template>
       <template is="dom-if" if="[[optionsTrack]]">
         <div data-action="close" class="overlay" on-click="_modalClick">
           <div class="card card-modal">
@@ -289,7 +297,10 @@ class TracksPage extends PolymerElement {
   }
 
   _getCoverArt(coverArt) {
-    return `../../assets/uploads/albumcover/${coverArt}` || "../../assets/images/icons/default_cover_art.svg";
+    return (
+      `../../assets/uploads/albumcover/${coverArt}` ||
+      "../../assets/images/icons/default_cover_art.svg"
+    );
   }
 
   _onDown(e) {

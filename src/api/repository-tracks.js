@@ -11,6 +11,7 @@ class RepositoryTracks extends PolymerElement {
         url="[[getTracksUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -20,6 +21,7 @@ class RepositoryTracks extends PolymerElement {
         params="[[searchTracksParams]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -28,6 +30,15 @@ class RepositoryTracks extends PolymerElement {
         body="[[uploadTracksBody]]"
         url="[[uploadTracksUrl]]"
         headers="[[headers]]"
+        reject-with-request
+      >
+      </iron-ajax>
+      <iron-ajax
+        id="syncTracks"
+        method="GET"
+        url="[[syncTracksUrl]]"
+        headers="[[headers]]"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -36,6 +47,7 @@ class RepositoryTracks extends PolymerElement {
         url="[[getTrackUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -44,6 +56,7 @@ class RepositoryTracks extends PolymerElement {
         url="[[deleteTrackUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
     `;
@@ -61,6 +74,10 @@ class RepositoryTracks extends PolymerElement {
       uploadTracksUrl: {
         type: String,
         value: apiHelper.uploadTracksUrl()
+      },
+      syncTracksUrl: {
+        type: String,
+        value: apiHelper.syncTracksUrl()
       },
       getTrackUrl: String,
       deleteTrackUrl: String,
@@ -82,7 +99,7 @@ class RepositoryTracks extends PolymerElement {
           resolve(tracks);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -101,7 +118,7 @@ class RepositoryTracks extends PolymerElement {
           resolve(tracks);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -116,7 +133,7 @@ class RepositoryTracks extends PolymerElement {
           resolve(tracks);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -131,7 +148,7 @@ class RepositoryTracks extends PolymerElement {
           resolve(track);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -146,7 +163,21 @@ class RepositoryTracks extends PolymerElement {
           resolve(track);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
+        });
+    });
+  }
+  syncTracks() {
+    return new Promise((resolve, reject) => {
+      this.set("headers", apiHelper.getApiHeaders());
+      this.$.syncTracks
+        .generateRequest()
+        .completes.then(request => {
+          let track = request.response;
+          resolve(track);
+        })
+        .catch(error => {
+          reject(error.request);
         });
     });
   }

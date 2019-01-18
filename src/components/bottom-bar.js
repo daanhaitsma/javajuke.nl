@@ -242,7 +242,7 @@ class BottomBar extends PolymerElement {
   }
 
   _showBar(page) {
-    return page !== "login";
+    return page !== "login" && page !== "register";
   }
 
   _getProgress(time, total) {

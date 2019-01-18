@@ -3,7 +3,7 @@ import "@polymer/paper-ripple/paper-ripple.js";
 import "@polymer/paper-input/paper-input.js";
 import "../style/shared-styles.js";
 
-class LoginPage extends PolymerElement {
+class RegisterPage extends PolymerElement {
   static get template() {
     return html`
       <style include="shared-styles">
@@ -69,15 +69,17 @@ class LoginPage extends PolymerElement {
             value="{{username}}"
           ></paper-input>
           <paper-input
+            type="email"
+            label="Email"
+            value="{{email}}"
+          ></paper-input>
+          <paper-input
             type="password"
             label="Password"
             value="{{password}}"
           ></paper-input>
           <button class="login-button" on-click="_register">
             REGISTER<paper-ripple></paper-ripple>
-          </button>
-          <button class="login-button" on-click="_login">
-            LOGIN<paper-ripple></paper-ripple>
           </button>
         </div>
       </div>
@@ -90,6 +92,7 @@ class LoginPage extends PolymerElement {
         observer: "_activeChanged"
       },
       username: String,
+      email: String,
       password: String
     };
   }
@@ -97,22 +100,22 @@ class LoginPage extends PolymerElement {
   _activeChanged(active) {
     if (active) {
       this.set("username", "");
+      this.set("email", "");
       this.set("password", "");
     }
   }
 
-  _login() {
-    window.dispatchEvent(
-      new CustomEvent("login-user", {
-        detail: { username: this.username, password: this.password }
-      })
-    );
-  }
   _register() {
     window.dispatchEvent(
-      new CustomEvent("set-path", { detail: { path: "/register" } })
+      new CustomEvent("register-user", {
+        detail: {
+          username: this.username,
+          email: this.email,
+          password: this.password
+        }
+      })
     );
   }
 }
 
-window.customElements.define("login-page", LoginPage);
+window.customElements.define("register-page", RegisterPage);

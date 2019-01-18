@@ -11,6 +11,7 @@ class RepositoryPlaylists extends PolymerElement {
         url="[[getPlaylistsUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -19,6 +20,7 @@ class RepositoryPlaylists extends PolymerElement {
         url="[[removeFromPlaylistUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -27,6 +29,7 @@ class RepositoryPlaylists extends PolymerElement {
         url="[[addToPlaylistUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -36,6 +39,7 @@ class RepositoryPlaylists extends PolymerElement {
         body="[[createPlaylistBody]]"
         url="[[createPlaylistUrl]]"
         headers="[[headers]]"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -44,6 +48,7 @@ class RepositoryPlaylists extends PolymerElement {
         url="[[getPlaylistUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
       <iron-ajax
@@ -52,6 +57,7 @@ class RepositoryPlaylists extends PolymerElement {
         url="[[removePlaylistUrl]]"
         headers="[[headers]]"
         handle-as="json"
+        reject-with-request
       >
       </iron-ajax>
     `;
@@ -105,7 +111,7 @@ class RepositoryPlaylists extends PolymerElement {
           resolve(playlists);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -120,7 +126,7 @@ class RepositoryPlaylists extends PolymerElement {
           resolve(playlists);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -137,7 +143,7 @@ class RepositoryPlaylists extends PolymerElement {
           resolve(playlist);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -152,7 +158,7 @@ class RepositoryPlaylists extends PolymerElement {
           resolve(playlist);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }
@@ -167,7 +173,7 @@ class RepositoryPlaylists extends PolymerElement {
           resolve(playlists);
         })
         .catch(error => {
-          reject(error);
+          reject(error.request);
         });
     });
   }

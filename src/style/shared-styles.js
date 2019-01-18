@@ -190,6 +190,26 @@ $_documentContainer.innerHTML = `
         .add-new:active {
           box-shadow: var(--box-shadow-active);
         }
+
+        .empty-list-container {
+          padding: 16px;
+          width: 100%;
+          box-sizing: border-box;
+          color: #bdbdbd;
+        }
+
+        .empty-list-icon {
+          margin: 0px calc(50% - 108px);
+          width: 216px;
+          height: 216px;
+        }
+
+        .empty-list-message {
+          font-size: 24px;
+          font-weight: 600;
+          text-align: center;
+          margin: 0;
+        }
       </style>
     </template>
   </dom-module>

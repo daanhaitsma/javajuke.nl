@@ -287,7 +287,9 @@ class AppShell extends PolymerElement {
   }
 
   _timer(state) {
-    this.set("state.position", state.position + 1);
+    if (state.currentTrack.duration > state.position) {
+      this.set("state.position", state.position + 1);
+    }
   }
 
   _routePageChanged(page) {

@@ -297,10 +297,11 @@ class TracksPage extends PolymerElement {
   }
 
   _getCoverArt(coverArt) {
-    return (
-      `../../assets/uploads/albumcover/${coverArt}` ||
-      "../../assets/images/icons/default_cover_art.svg"
-    );
+    if (coverArt) {
+      return `../../assets/uploads/albumcover/${coverArt}`;
+    } else {
+      return "../../assets/images/icons/default_cover_art.svg";
+    }
   }
 
   _onDown(e) {

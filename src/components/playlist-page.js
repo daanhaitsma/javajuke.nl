@@ -179,7 +179,9 @@ class PlaylistPage extends PolymerElement {
       <template is="dom-if" if="[[!playlist.tracks.length]]">
         <div class="empty-list-container">
           <iron-icon class="empty-list-icon" icon="track"></iron-icon>
-          <p class="empty-list-message">There are no tracks in this playlist yet</p>
+          <p class="empty-list-message">
+            There are no tracks in this playlist yet
+          </p>
         </div>
       </template>
       <template is="dom-if" if="[[selected]]">
@@ -240,10 +242,11 @@ class PlaylistPage extends PolymerElement {
   }
 
   _getCoverArt(coverArt) {
-    return (
-      `../../assets/uploads/albumcover/${coverArt}` ||
-      "../../assets/images/icons/default_cover_art.svg"
-    );
+    if (coverArt) {
+      return `../../assets/uploads/albumcover/${coverArt}`;
+    } else {
+      return "../../assets/images/icons/default_cover_art.svg";
+    }
   }
 
   _play() {

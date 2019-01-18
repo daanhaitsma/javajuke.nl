@@ -322,7 +322,6 @@ class AppShell extends PolymerElement {
         import("./login-page.js");
         break;
       case "404":
-        // import("./404-page.js");
         break;
       default:
         this._setPath(`/404`);

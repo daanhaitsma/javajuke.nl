@@ -444,8 +444,8 @@ class AppShell extends PolymerElement {
       case "shuffle":
         this.$.repositoryPlayer
           .toggleShuffle()
-          .then(result => {
-            this.set("state", result);
+          .then(() => {
+            // this.set("state", result);
           })
           .catch(error => {
             if (error.response) {
@@ -557,6 +557,11 @@ class AppShell extends PolymerElement {
       .uploadTracks(files)
       .then(() => {
         this._getTracks();
+        this.set(
+          "successToastMessage",
+          "Tracks where successfully uploaded"
+        );
+        this.$.successToast.open();
       })
       .catch(error => {
         if (error.response) {
@@ -790,6 +795,11 @@ class AppShell extends PolymerElement {
       .register(email, username, password)
       .then(result => {
         this._setPath("/login", []);
+        this.set(
+          "successToastMessage",
+          "You have successfully registered your account"
+        );
+        this.$.successToast.open();
       })
       .catch(error => {
         if (error.response) {

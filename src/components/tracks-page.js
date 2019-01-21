@@ -298,7 +298,7 @@ class TracksPage extends PolymerElement {
 
   _getCoverArt(coverArt) {
     if (coverArt) {
-      return `../../assets/uploads/albumcover/${coverArt}`;
+      return `https://coverart.javajuke.nl/${coverArt}`;
     } else {
       return "../../assets/images/icons/default_cover_art.svg";
     }

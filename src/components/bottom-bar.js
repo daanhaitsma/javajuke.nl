@@ -237,7 +237,7 @@ class BottomBar extends PolymerElement {
   }
 
   _showActive(page, activeTrack) {
-    let pages = ["home", "tracks", "playlists", "search", "playlist"];
+    let pages = ["home", "tracks", "playlists", "search", "playlist", "settings"];
     return pages.includes(page) && activeTrack ? " active" : "";
   }
 

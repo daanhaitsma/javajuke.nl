@@ -483,9 +483,7 @@ class AppShell extends PolymerElement {
   _previousTrack() {
     this.$.repositoryPlayer
       .previousTrack()
-      .then(result => {
-        this.set("state", result);
-      })
+      .then(() => {})
       .catch(error => {
         if (error.response) {
           switch (error.response.code) {
@@ -502,9 +500,7 @@ class AppShell extends PolymerElement {
   _nextTrack() {
     this.$.repositoryPlayer
       .nextTrack()
-      .then(result => {
-        this.set("state", result);
-      })
+      .then(() => {})
       .catch(error => {
         if (error.response) {
           switch (error.response.code) {

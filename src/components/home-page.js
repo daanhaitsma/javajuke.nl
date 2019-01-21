@@ -69,11 +69,11 @@ class HomePage extends PolymerElement {
           font-weight: 600;
           color: #757575;
         }
-        .track-title.active {
-          color: var(--active-color);
-        }
         .track-artist {
           color: #bdbdbd;
+        }
+        div.track-card:first-of-type > div.track-card-content > p.track-title {
+          color: var(--active-color);
         }
       </style>
       <div class="page-header"><p class="title">Queue</p></div>
@@ -87,11 +87,7 @@ class HomePage extends PolymerElement {
                 alt=""
               />
               <div class="track-card-content">
-                <p
-                  class$="track-title[[_active(track.id, state.currentTrack.id)]]"
-                >
-                  [[track.title]]
-                </p>
+                <p class="track-title">[[track.title]]</p>
                 <p class="track-artist">[[track.artist]]</p>
               </div>
             </div>
@@ -111,10 +107,6 @@ class HomePage extends PolymerElement {
       user: Object,
       state: Object
     };
-  }
-
-  _active(track, activeTrack) {
-    return track === activeTrack ? " active" : "";
   }
 
   _getCoverArt(coverArt) {

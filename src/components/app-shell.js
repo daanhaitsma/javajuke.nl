@@ -557,10 +557,7 @@ class AppShell extends PolymerElement {
       .uploadTracks(files)
       .then(() => {
         this._getTracks();
-        this.set(
-          "successToastMessage",
-          "Tracks where successfully uploaded"
-        );
+        this.set("successToastMessage", "Tracks where successfully uploaded");
         this.$.successToast.open();
       })
       .catch(error => {
@@ -568,6 +565,10 @@ class AppShell extends PolymerElement {
           switch (error.response.code) {
             case 401:
               this._logout();
+              break;
+            case 400:
+              this.set("errorToastMessage", "Tracks artist or title is missing");
+              this.$.errorToast.open();
               break;
           }
         } else {
@@ -770,7 +771,7 @@ class AppShell extends PolymerElement {
 
   _login(username, password) {
     this.$.repositoryAuth
-      .login("", username, password)
+      .login(username, password)
       .then(result => {
         cookieHelper.setCookie("auth_token", result.token, 1440);
         this.set("user", result);

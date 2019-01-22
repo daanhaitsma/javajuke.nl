@@ -64,19 +64,47 @@ class RegisterPage extends PolymerElement {
         <img class="logo" src="assets/images/manifest/icon-512x512.png" />
         <div class="card login-card">
           <paper-input
+            id="username"
             type="text"
             label="Username"
+            required
+            error-message="Username has to be atleast 5 characters"
+            auto-validate="[[autoValidate]]"
+            pattern="[[usernamePattern]]"
+            invalid="{{usernameInvalid}}"
             value="{{username}}"
           ></paper-input>
           <paper-input
+            id="email"
             type="email"
             label="Email"
+            required
+            error-message="Invalid Email"
+            auto-validate="[[autoValidate]]"
+            invalid="{{emailInvalid}}"
             value="{{email}}"
           ></paper-input>
           <paper-input
+            id="password"
             type="password"
             label="Password"
+            required
+            error-message="Password has to be atleast 8 characters"
+            auto-validate="[[autoValidate]]"
+            pattern="[[passwordPattern]]"
+            invalid="{{passwordInvalid}}"
             value="{{password}}"
+          ></paper-input>
+          <paper-input
+            id="passwordRepeat"
+            type="password"
+            label="Repeat password"
+            required
+            error-message="Password does not match"
+            auto-validate="[[autoValidate]]"
+            pattern="[[password]]"
+            invalid="{{passwordRepeatInvalid}}"
+            value="{{passwordRepeat}}"
           ></paper-input>
           <button class="login-button" on-click="_register">
             REGISTER<paper-ripple></paper-ripple>
@@ -93,28 +121,59 @@ class RegisterPage extends PolymerElement {
       },
       username: String,
       email: String,
-      password: String
+      password: String,
+      passwordRepeat: String,
+      usernamePattern: {
+        type: String,
+        value: "[a-zA-Z]{5,}"
+      },
+      passwordPattern: {
+        type: String,
+        value: ".{8,}"
+      },
+      autoValidate: {
+        type: Boolean,
+        value: false
+      },
+      usernameInvalid: Boolean,
+      emailInvalid: Boolean,
+      passwordInvalid: Boolean,
+      passwordRepeatInvalid: Boolean
     };
   }
 
   _activeChanged(active) {
     if (active) {
+      this.set("autoValidate", false);
       this.set("username", "");
       this.set("email", "");
       this.set("password", "");
+      this.set("passwordRepeat", "");
     }
   }
 
   _register() {
-    window.dispatchEvent(
-      new CustomEvent("register-user", {
-        detail: {
-          username: this.username,
-          email: this.email,
-          password: this.password
-        }
-      })
-    );
+    this.set("autoValidate", true);
+    this.$.username.validate();
+    this.$.email.validate();
+    this.$.password.validate();
+    this.$.passwordRepeat.validate();
+    if (
+      !this.usernameInvalid &&
+      !this.emailInvalid &&
+      !this.passwordInvalid &&
+      !this.passwordRepeatInvalid
+    ) {
+      window.dispatchEvent(
+        new CustomEvent("register-user", {
+          detail: {
+            username: this.username,
+            email: this.email,
+            password: this.password
+          }
+        })
+      );
+    }
   }
 }
 

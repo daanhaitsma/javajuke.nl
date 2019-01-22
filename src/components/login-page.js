@@ -64,20 +64,31 @@ class LoginPage extends PolymerElement {
         <img class="logo" src="assets/images/manifest/icon-512x512.png" />
         <div class="card login-card">
           <paper-input
+            id="username"
             type="text"
-            label="Username"
+            label="Username of Email"
+            required
+            error-message="Invalid username or email"
+            auto-validate="[[autoValidate]]"
+            invalid="{{usernameInvalid}}"
             value="{{username}}"
           ></paper-input>
           <paper-input
+            id="password"
             type="password"
             label="Password"
+            required
+            error-message="Invalid password"
+            auto-validate="[[autoValidate]]"
+            pattern="[[passwordPattern]]"
+            invalid="{{passwordInvalid}}"
             value="{{password}}"
           ></paper-input>
-          <button class="login-button" on-click="_register">
-            REGISTER<paper-ripple></paper-ripple>
-          </button>
           <button class="login-button" on-click="_login">
             LOGIN<paper-ripple></paper-ripple>
+          </button>
+          <button class="login-button" on-click="_register">
+            REGISTER<paper-ripple></paper-ripple>
           </button>
         </div>
       </div>
@@ -90,23 +101,39 @@ class LoginPage extends PolymerElement {
         observer: "_activeChanged"
       },
       username: String,
-      password: String
+      password: String,
+      passwordPattern: {
+        type: String,
+        value: ".{8,}"
+      },
+      autoValidate: {
+        type: Boolean,
+        value: false
+      },
+      usernameInvalid: Boolean,
+      passwordInvalid: Boolean
     };
   }
 
   _activeChanged(active) {
     if (active) {
+      this.set("autoValidate", false);
       this.set("username", "");
       this.set("password", "");
     }
   }
 
   _login() {
-    window.dispatchEvent(
-      new CustomEvent("login-user", {
-        detail: { username: this.username, password: this.password }
-      })
-    );
+    this.set("autoValidate", true);
+    this.$.username.validate();
+    this.$.password.validate();
+    if (!this.usernameInvalid && !this.passwordInvalid) {
+      window.dispatchEvent(
+        new CustomEvent("login-user", {
+          detail: { username: this.username, password: this.password }
+        })
+      );
+    }
   }
   _register() {
     window.dispatchEvent(

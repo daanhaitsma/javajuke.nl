@@ -87,10 +87,9 @@ class RepositoryAuth extends PolymerElement {
         });
     });
   }
-  login(email, username, password) {
+  login(username, password) {
     return new Promise((resolve, reject) => {
       this.set("loginBody", {
-        email: email,
         username: username,
         password: password
       });

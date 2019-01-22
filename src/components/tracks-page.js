@@ -93,6 +93,9 @@ class TracksPage extends PolymerElement {
         .upload-track:active {
           box-shadow: var(--box-shadow-active);
         }
+        .upload-track:disabled {
+          background-color: #757575;
+        }
         .track-input {
           display: inherit;
           width: 0.1px;
@@ -239,7 +242,11 @@ class TracksPage extends PolymerElement {
                   selected
                 </label>
               </template>
-              <button data-action="uploadTracks" class="upload-track">
+              <button
+                data-action="uploadTracks"
+                class="upload-track"
+                disabled="[[!files.length]]"
+              >
                 Upload<paper-ripple></paper-ripple>
               </button>
             </div>

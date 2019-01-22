@@ -165,9 +165,7 @@ class PlaylistsPage extends PolymerElement {
       <template is="dom-if" if="[[!playlists.length]]">
         <div class="empty-list-container">
           <iron-icon class="empty-list-icon" icon="folder"></iron-icon>
-          <p class="empty-list-message">
-            There are no playlists yet
-          </p>
+          <p class="empty-list-message">There are no playlists yet</p>
         </div>
       </template>
       <template is="dom-if" if="[[optionsPlaylist]]">
@@ -191,8 +189,13 @@ class PlaylistsPage extends PolymerElement {
             <div class="modal-input-content">
               <p class="modal-title">Create Playlist</p>
               <paper-input
+                id="name"
                 type="text"
                 label="Name"
+                required
+                auto-validate="[[autoValidate]]"
+                invalid="{{playlistNameInvalid}}"
+                error-message="Name has to be atleast 1 character"
                 value="{{playlist.name}}"
               ></paper-input>
               <button data-action="createPlaylist" class="create-playlist">
@@ -209,6 +212,11 @@ class PlaylistsPage extends PolymerElement {
       active: {
         type: Boolean,
         observer: "_activeChanged"
+      },
+      playlistNameInvalid: Boolean,
+      autoValidate: {
+        type: Boolean,
+        value: false
       },
       tracks: Array,
       playlists: Array,
@@ -268,19 +276,26 @@ class PlaylistsPage extends PolymerElement {
           this.set("optionsPlaylist", null);
           break;
         case "createPlaylist":
-          window.dispatchEvent(
-            new CustomEvent("create-playlist", {
-              detail: {
-                name: this.get("playlist").name
-              }
-            })
-          );
-          this.set("create", false);
-          this.set("playlist.name", "");
+          this.shadowRoot.getElementById("name").validate();
+          this.set("autoValidate", true);
+          if (!this.playlistNameInvalid) {
+            window.dispatchEvent(
+              new CustomEvent("create-playlist", {
+                detail: {
+                  name: this.get("playlist").name
+                }
+              })
+            );
+            this.set("create", false);
+            this.set("playlist.name", "");
+            this.set("autoValidate", false);
+          }
           break;
         case "close":
           this.set("optionsPlaylist", null);
           this.set("create", false);
+          this.set("autoValidate", false);
+          this.set("playlistNameInvalid", false);
           break;
       }
     }

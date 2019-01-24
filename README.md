@@ -14,7 +14,6 @@ $ npm install -g polymer-cli
 ```
 
 After the depencencies have finished installing, the application itself can be installed. This is done using git.
-
 ```
 $ git clone https://github.com/daanhaitsma/javajuke.nl.git
 $ cd javajuke.nl

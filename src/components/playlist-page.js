@@ -218,7 +218,9 @@ class PlaylistPage extends PolymerElement {
 
   _playlistChanged(playlist) {
     playlist = Number(playlist);
+    // Check if the playlist id is larger than 0
     if (playlist > 0) {
+      // If so send an get playlist event to the app-shell containing the playlist id
       window.dispatchEvent(
         new CustomEvent("get-playlist", {
           detail: {
@@ -230,26 +232,32 @@ class PlaylistPage extends PolymerElement {
   }
 
   _equals(value, check) {
+    // Return if values are equal
     return value === check;
   }
 
   _isYourPlaylist(id, owner) {
+    // Return if playlist is yours
     return id === owner ? " yours" : "";
   }
 
   _active(track, activeTrack) {
+    // Return active if track is current playling track
     return track === activeTrack ? " active" : "";
   }
 
   _getCoverArt(coverArt) {
     if (coverArt) {
+      // Return the cover art if the track has an album
       return `https://coverart.javajuke.nl/${coverArt}`;
     } else {
+      // Else return the default art
       return "../../assets/images/icons/default_cover_art.svg";
     }
   }
 
   _play() {
+    // Send an play playlist event to the app-shell containing the playlist id
     window.dispatchEvent(
       new CustomEvent("play-playlist", {
         detail: {
@@ -265,12 +273,11 @@ class PlaylistPage extends PolymerElement {
   }
 
   _modalClick(e) {
+    // Check if the clicked element has an action
     if (e.target.dataset.action) {
       switch (e.target.dataset.action) {
-        case "addToPlaylist":
-          this.set("selected", null);
-          break;
         case "removeFromPlaylist":
+          // Send an remove track from playlist event to the app-shell containing the playlist id and track id
           window.dispatchEvent(
             new CustomEvent("remove-from-playlist", {
               detail: {
@@ -279,9 +286,11 @@ class PlaylistPage extends PolymerElement {
               }
             })
           );
+          // Close the modal
           this.set("selected", null);
           break;
         case "close":
+          // Close the modal
           this.set("selected", null);
           break;
       }
@@ -289,28 +298,26 @@ class PlaylistPage extends PolymerElement {
   }
 
   _trackClick(e) {
+    // Check if the clicked element has an action
     switch (e.target.dataset.action) {
       case "play":
-        if (
-          (this.state.currentTrack &&
-            this.state.currentTrack.id !== Number(e.target.dataset.track)) ||
-          !this.state.currentTrack
-        ) {
-          window.dispatchEvent(
-            new CustomEvent("add-to-queue", {
-              detail: {
-                track: this.playlist.tracks.find(item => {
-                  return item.id === Number(e.target.dataset.track);
-                })
-              }
-            })
-          );
-        }
+        // Send an add to queue event to the app-shell containing the track
+        window.dispatchEvent(
+          new CustomEvent("add-to-queue", {
+            detail: {
+              track: this.playlist.tracks.find(item => {
+                return item.id === Number(e.target.dataset.track);
+              })
+            }
+          })
+        );
         break;
       case "options":
+        // Get the selected track
         let track = this.playlist.tracks.find(item => {
           return item.id === Number(e.target.dataset.track);
         });
+        // Open the options modal
         this.set("selected", track);
         break;
     }

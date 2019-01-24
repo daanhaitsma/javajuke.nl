@@ -244,7 +244,9 @@ class PlayerPage extends PolymerElement {
   }
 
   _trackChanged(track) {
+    // Check if the player page is active and there is a track playing
     if (this.active && !track) {
+      // If active but no track playing send an navigation event to the app-shell to leave the player page
       window.dispatchEvent(
         new CustomEvent("set-path", {
           detail: { path: "/tracks", history: [] }
@@ -254,38 +256,50 @@ class PlayerPage extends PolymerElement {
   }
 
   _active(active) {
+    // Return active if true
     return active ? " active" : "";
   }
 
   _convertTime(time) {
+    // Check if it has time
     if (time) {
+      // Get the minutes
       let minutes = time % 60;
+      // Check if minutes is smaller than 10
       if (minutes < 10) {
+        // If so add a 0 in front of it
         minutes = `0${minutes}`;
       }
+      // Return the time
       return `${Math.floor(time / 60)}:${minutes}`;
     } else {
+      // Else return 0:00
       return "0:00";
     }
   }
 
   _getProgress(time, total) {
+    // Return the progress of the time
     return (time * 100) / total || 0;
   }
 
   _getIcon(paused) {
+    // Return play or pause
     return paused ? "play" : "pause";
   }
 
   _getCoverArt(coverArt) {
     if (coverArt) {
+      // Return the cover art if the track has an album
       return `https://coverart.javajuke.nl/${coverArt}`;
     } else {
+      // Else return the default art
       return "../../assets/images/icons/default_cover_art.svg";
     }
   }
 
   _shuffle() {
+    // Send an shuffle event to the app-shell
     window.dispatchEvent(
       new CustomEvent("toggle-state", {
         detail: { state: "shuffle" }
@@ -294,6 +308,7 @@ class PlayerPage extends PolymerElement {
   }
 
   _repeat() {
+    // Send an repeat event to the app-shell
     window.dispatchEvent(
       new CustomEvent("toggle-state", {
         detail: { state: "repeat" }
@@ -302,14 +317,17 @@ class PlayerPage extends PolymerElement {
   }
 
   _previousTrack() {
+    // Send an previous track event to the app-shell
     window.dispatchEvent(new CustomEvent("previous-track", { detail: {} }));
   }
 
   _nextTrack() {
+    // Send an next track event to the app-shell
     window.dispatchEvent(new CustomEvent("next-track", { detail: {} }));
   }
 
   _playPause() {
+    // Send an play/pause event to the app-shell
     window.dispatchEvent(
       new CustomEvent("toggle-state", {
         detail: { state: "playing" }
@@ -318,11 +336,12 @@ class PlayerPage extends PolymerElement {
   }
 
   _volume() {
+    // Open the volume modal
     this.set("volumeControl", true);
   }
 
   _volumeChange(e) {
-    console.log(e.target.value);
+    // Send an volume change event to the app-shell containing the volume level
     window.dispatchEvent(
       new CustomEvent("set-volume", {
         detail: { volume: e.target.value }
@@ -331,9 +350,11 @@ class PlayerPage extends PolymerElement {
   }
 
   _modalClick(e) {
+    // Check if the clicked element has an action
     if (e.target.dataset.action) {
       switch (e.target.dataset.action) {
         case "close":
+          // Close the volume modal
           this.set("volumeControl", false);
           break;
       }

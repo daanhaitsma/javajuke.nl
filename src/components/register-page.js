@@ -143,7 +143,9 @@ class RegisterPage extends PolymerElement {
   }
 
   _activeChanged(active) {
+    // Check if page is active
     if (active) {
+      // If active reset all inputs
       this.set("autoValidate", false);
       this.set("username", "");
       this.set("email", "");
@@ -153,17 +155,20 @@ class RegisterPage extends PolymerElement {
   }
 
   _register() {
+    // Validate all inputs
     this.set("autoValidate", true);
     this.$.username.validate();
     this.$.email.validate();
     this.$.password.validate();
     this.$.passwordRepeat.validate();
+    // Check if all inputs are valid
     if (
       !this.usernameInvalid &&
       !this.emailInvalid &&
       !this.passwordInvalid &&
       !this.passwordRepeatInvalid
     ) {
+      // If valid send an registration event to the app-shell containing the username, email and password
       window.dispatchEvent(
         new CustomEvent("register-user", {
           detail: {

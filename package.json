@@ -1,14 +1,13 @@
 {
-  "name": "my-app",
-  "version": "0.0.1",
-  "description": "My App description",
+  "name": "java-juke",
+  "version": "1.0.0",
+  "description": "De magie van een jukebox in de 21ste eeuw!",
   "author": "Thomas Stoevelaar",
   "repository": "daanhaitsma/javajuke.nl",
   "scripts": {
     "start": "polymer serve",
     "build": "polymer build",
-    "lint": "polymer lint",
-    "deploy": "polymer build && firebase deploy"
+    "lint": "polymer lint"
   },
   "dependencies": {
     "@polymer/app-route": "^3.0.2",

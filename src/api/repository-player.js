@@ -133,136 +133,185 @@ class RepositoryPlayer extends PolymerElement {
     };
   }
   getState() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.getState
         .generateRequest()
         .completes.then(request => {
           let state = request.response;
+          // Resolve the promise with the response
           resolve(this._formatState(state));
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   setVolume(volume) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Set the request body
       this.set("setVolumeBody", { volume: volume });
+      // Generate the request
       this.$.setVolume
         .generateRequest()
         .completes.then(request => {
           let state = request.response;
+          // Resolve the promise with the response
           resolve(this._formatState(state));
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   addToQueue(track) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Set the request body
       this.set("addToQueueBody", { track: track });
+      // Generate the request
       this.$.addToQueue
         .generateRequest()
         .completes.then(request => {
           let state = request.response;
+          // Resolve the promise with the response
           resolve(this._formatState(state));
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   togglePlay() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.togglePlay
         .generateRequest()
         .completes.then(request => {
           let state = request.response;
+          // Resolve the promise with the response
           resolve(this._formatState(state));
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   toggleRepeat() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.toggleRepeat
         .generateRequest()
         .completes.then(request => {
           let state = request.response;
+          // Resolve the promise with the response
           resolve(this._formatState(state));
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   toggleShuffle() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.toggleShuffle
         .generateRequest()
         .completes.then(request => {
           let state = request.response;
+          // Resolve the promise with the response
           resolve(this._formatState(state));
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   nextTrack() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.nextTrack
         .generateRequest()
         .completes.then(request => {
           let state = request.response;
+          // Resolve the promise with the response
           resolve(this._formatState(state));
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   previousTrack() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.previousTrack
         .generateRequest()
         .completes.then(request => {
           let state = request.response;
+          // Resolve the promise with the response
           resolve(this._formatState(state));
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   playPlaylist(id) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Get the request url
       this.set("playPlaylistUrl", apiHelper.playPlaylistUrl(id));
+      // Generate the request
       this.$.playPlaylist
         .generateRequest()
         .completes.then(request => {
           let state = request.response;
+          // Resolve the promise with the response
           resolve(this._formatState(state));
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
 
   _formatState(state) {
+    // Change the returned playing position from miliseconds to seconds
     state.position = Math.round(Number(state.position) / 1000);
     return state;
   }

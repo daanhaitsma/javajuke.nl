@@ -90,93 +90,127 @@ class RepositoryTracks extends PolymerElement {
     };
   }
   getTracks() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.getTracks
         .generateRequest()
         .completes.then(request => {
           let tracks = request.response.data;
+          // Resolve the promise with the response
           resolve(tracks);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   uploadTracks(files) {
+    // Return a promise
     return new Promise((resolve, reject) => {
       let formData = new FormData();
       for (let i = 0; i < files.length; i++) {
         formData.append("files", files[i]);
       }
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Set the request body
       this.set("uploadTracksBody", formData);
+      // Generate the request
       this.$.uploadTracks
         .generateRequest()
         .completes.then(request => {
           let tracks = request.response.data;
+          // Resolve the promise with the response
           resolve(tracks);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   searchTracks(search) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Set the request parameters
       this.set("searchTracksParams", { search: search });
+      // Generate the request
       this.$.searchTracks
         .generateRequest()
         .completes.then(request => {
           let tracks = request.response.data;
+          // Resolve the promise with the response
           resolve(tracks);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   getTrack(id) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Get the request url
       this.set("getTrackUrl", apiHelper.getTrackUrl(id));
+      // Generate the request
       this.$.getTrack
         .generateRequest()
         .completes.then(request => {
           let track = request.response;
+          // Resolve the promise with the response
           resolve(track);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   deleteTrack(id) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Get the request url
       this.set("deleteTrackUrl", apiHelper.deleteTrackUrl(id));
+      // Generate the request
       this.$.deleteTrack
         .generateRequest()
         .completes.then(request => {
           let track = request.response;
+          // Resolve the promise with the response
           resolve(track);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   syncTracks() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.syncTracks
         .generateRequest()
         .completes.then(request => {
           let track = request.response;
+          // Resolve the promise with the response
           resolve(track);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });

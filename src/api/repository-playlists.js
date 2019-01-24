@@ -84,95 +84,130 @@ class RepositoryPlaylists extends PolymerElement {
     };
   }
   getPlaylists() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.getPlaylists
         .generateRequest()
         .completes.then(request => {
           let Playlists = request.response.data;
+          // Resolve the promise with the response
           resolve(Playlists);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error);
         });
     });
   }
   removeFromPlaylist(playlist, track) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Get the request url
       this.set(
         "removeFromPlaylistUrl",
         apiHelper.removeFromPlaylistUrl(playlist, track)
       );
+      // Generate the request
       this.$.removeFromPlaylist
         .generateRequest()
         .completes.then(request => {
           let playlists = request.response;
+          // Resolve the promise with the response
           resolve(playlists);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   addToPlaylist(playlist, track) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Get the request url
       this.set("addToPlaylistUrl", apiHelper.addToPlaylistUrl(playlist, track));
+      // Generate the request
       this.$.addToPlaylist
         .generateRequest()
         .completes.then(request => {
           let playlists = request.response;
+          // Resolve the promise with the response
           resolve(playlists);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   createPlaylist(name) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Set the request body
       this.set("createPlaylistBody", {
         name: name
       });
+      // Generate the request
       this.$.createPlaylist
         .generateRequest()
         .completes.then(request => {
           let playlist = request.response;
+          // Resolve the promise with the response
           resolve(playlist);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   getPlaylist(id) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Get the request url
       this.set("getPlaylistUrl", apiHelper.getPlaylistUrl(id));
+      // Generate the request
       this.$.getPlaylist
         .generateRequest()
         .completes.then(request => {
           let playlist = request.response;
+          // Resolve the promise with the response
           resolve(playlist);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   removePlaylist(id) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Get the request url
       this.set("removePlaylistUrl", apiHelper.removePlaylistUrl(id));
+      // Generate the request
       this.$.removePlaylist
         .generateRequest()
         .completes.then(request => {
           let playlists = request.response;
+          // Resolve the promise with the response
           resolve(playlists);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });

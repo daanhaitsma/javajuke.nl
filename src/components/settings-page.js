@@ -58,14 +58,16 @@ class SettingsPage extends PolymerElement {
   }
 
   _scanFolder() {
+    // Send an sync tracks event to the app-shell
     window.dispatchEvent(
-        new CustomEvent("sync-tracks", {
-          detail: {}
-        })
-      );
+      new CustomEvent("sync-tracks", {
+        detail: {}
+      })
+    );
   }
 
   _logout() {
+    // Send an logout event to the app-shell
     window.dispatchEvent(
       new CustomEvent("logout-user", {
         detail: {}

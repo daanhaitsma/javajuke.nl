@@ -116,7 +116,9 @@ class LoginPage extends PolymerElement {
   }
 
   _activeChanged(active) {
+    // Check if page is active
     if (active) {
+      // Reset inputs and validation
       this.set("autoValidate", false);
       this.set("username", "");
       this.set("password", "");
@@ -124,10 +126,13 @@ class LoginPage extends PolymerElement {
   }
 
   _login() {
+    // Validate inputs
     this.set("autoValidate", true);
     this.$.username.validate();
     this.$.password.validate();
+    // Check if inputs are valid
     if (!this.usernameInvalid && !this.passwordInvalid) {
+      // If so send an login event to the app-shell containing the username/email and password
       window.dispatchEvent(
         new CustomEvent("login-user", {
           detail: { username: this.username, password: this.password }
@@ -136,6 +141,7 @@ class LoginPage extends PolymerElement {
     }
   }
   _register() {
+    // Send an navigation event to the app-shell containing the path
     window.dispatchEvent(
       new CustomEvent("set-path", { detail: { path: "/register" } })
     );

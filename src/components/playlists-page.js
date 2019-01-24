@@ -236,7 +236,9 @@ class PlaylistsPage extends PolymerElement {
   }
 
   _activeChanged(active) {
+    // Check if page is active
     if (active) {
+      // If active get all playlists
       window.dispatchEvent(
         new CustomEvent("get-playlists", {
           detail: {}
@@ -246,10 +248,12 @@ class PlaylistsPage extends PolymerElement {
   }
 
   _isYourPlaylist(id, owner) {
+    // Return if playlist is yours
     return id === owner ? " yours" : "";
   }
 
   _equals(value, check) {
+    // Return if values are equal
     return value === check;
   }
 
@@ -259,13 +263,16 @@ class PlaylistsPage extends PolymerElement {
   }
 
   _createPlaylist() {
+    // Open create playlist modal
     this.set("create", true);
   }
 
   _modalClick(e) {
+    // Check if the clicked element has an action
     if (e.target.dataset.action) {
       switch (e.target.dataset.action) {
         case "removePlaylist":
+          // Send an remove playlist event to the app-shell containing the playlist id
           window.dispatchEvent(
             new CustomEvent("remove-playlist", {
               detail: {
@@ -273,12 +280,16 @@ class PlaylistsPage extends PolymerElement {
               }
             })
           );
+          // Close the options modal
           this.set("optionsPlaylist", null);
           break;
         case "createPlaylist":
+          // Validate the playlist name input
           this.shadowRoot.getElementById("name").validate();
           this.set("autoValidate", true);
+          // Check if the name is valid
           if (!this.playlistNameInvalid) {
+            // Send an create playlist event to the app-shell containing the playlist name
             window.dispatchEvent(
               new CustomEvent("create-playlist", {
                 detail: {
@@ -286,12 +297,14 @@ class PlaylistsPage extends PolymerElement {
                 }
               })
             );
+            // Close the create playlist modal and reset the name input
             this.set("create", false);
             this.set("playlist.name", "");
             this.set("autoValidate", false);
           }
           break;
         case "close":
+          // Close all modals and reset validation
           this.set("optionsPlaylist", null);
           this.set("create", false);
           this.set("autoValidate", false);
@@ -302,8 +315,10 @@ class PlaylistsPage extends PolymerElement {
   }
 
   _playlistClick(e) {
+    // Check if the clicked element has an action
     switch (e.target.dataset.action) {
       case "open":
+        // Send an navigation event to the app-shell containing the path
         window.dispatchEvent(
           new CustomEvent("set-path", {
             detail: { path: `/playlist/${e.target.dataset.playlist}` }
@@ -311,9 +326,11 @@ class PlaylistsPage extends PolymerElement {
         );
         break;
       case "options":
+        // Get the selected playlist
         let playlist = this.playlists.find(item => {
           return item.id === Number(e.target.dataset.playlist);
         });
+        // Open the options modal
         this.set("optionsPlaylist", playlist);
         break;
     }

@@ -70,16 +70,20 @@ class RepositoryAuth extends PolymerElement {
     };
   }
   register(email, username, password) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Set the request body
       this.set("registerBody", {
         email: email,
         username: username,
         password: password
       });
+      // Generate the request
       this.$.register
         .generateRequest()
         .completes.then(request => {
           let user = request.response;
+          // Resolve the promise with the response
           resolve(user);
         })
         .catch(error => {
@@ -88,58 +92,71 @@ class RepositoryAuth extends PolymerElement {
     });
   }
   login(username, password) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Set the request body
       this.set("loginBody", {
         username: username,
         password: password
       });
+      // Generate the request
       this.$.login
         .generateRequest()
         .completes.then(request => {
           let token = request.response;
-          console.log(request.response);
+          // Resolve the promise with the response
           resolve(token);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   register(email, username, password) {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Set the request body
       this.set("registerBody", {
         email: email,
         username: username,
         password: password
       });
+      // Generate the request
       this.$.register
         .generateRequest()
         .completes.then(request => {
           let response = request.response;
+          // Resolve the promise with the response
           resolve(response);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });
   }
   logout() {
-    return new Promise((resolve, reject) => {
-      this.set("headers", apiHelper.getApiHeaders());
-      this.$.logout.generateRequest();
-    });
+    // Get the authentication headers
+    this.set("headers", apiHelper.getApiHeaders());
+    // Generate the request
+    this.$.logout.generateRequest();
   }
   getUser() {
+    // Return a promise
     return new Promise((resolve, reject) => {
+      // Get the authentication headers
       this.set("headers", apiHelper.getApiHeaders());
+      // Generate the request
       this.$.getUser
         .generateRequest()
         .completes.then(request => {
           let user = request.response;
-          console.log(user);
+          // Resolve the promise with the response
           resolve(user);
         })
         .catch(error => {
+          // Reject the promise with the failed request
           reject(error.request);
         });
     });

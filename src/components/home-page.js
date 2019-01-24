@@ -111,8 +111,10 @@ class HomePage extends PolymerElement {
 
   _getCoverArt(coverArt) {
     if (coverArt) {
+      // Return the cover art if the track has an album
       return `https://coverart.javajuke.nl/${coverArt}`;
     } else {
+      // Else return the default art
       return "../../assets/images/icons/default_cover_art.svg";
     }
   }

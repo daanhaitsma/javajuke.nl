@@ -223,27 +223,25 @@ class SearchPage extends PolymerElement {
   }
 
   _activeChanged(active) {
+    // Check if the page is active
     if (active) {
+      // Check if the search query is empty
       if (this.get("searchQuery") === "") {
+        // If so do an empty search to show all the tracks
         window.dispatchEvent(
           new CustomEvent("search-tracks", {
             detail: { search: "" }
           })
         );
       } else {
+        // Else set the search query to empty (this will trigger the _searchQueryChanged)
         this.set("searchQuery", "");
       }
     }
   }
 
-  _playlistsChanged(playlists) {
-    let yourPlaylists = playlists.filter(playlist => {
-      return playlist.user.id === this.user.id;
-    });
-    this.set("yourPlaylists", yourPlaylists);
-  }
-
   _searchQueryChanged(searchQuery) {
+    // Send an search tracks event to the app-shell
     window.dispatchEvent(
       new CustomEvent("search-tracks", {
         detail: { search: searchQuery }
@@ -251,14 +249,27 @@ class SearchPage extends PolymerElement {
     );
   }
 
+  // Listen for changes in the playlists
+  _playlistsChanged(playlists) {
+    // Filter your playlists
+    let yourPlaylists = playlists.filter(playlist => {
+      return playlist.user.id === this.user.id;
+    });
+    // Set your playlists
+    this.set("yourPlaylists", yourPlaylists);
+  }
+
   _active(track, activeTrack) {
+    // Return active if the track is the current playing track
     return track === activeTrack ? " active" : "";
   }
 
   _getCoverArt(coverArt) {
     if (coverArt) {
+      // Return the cover art if the track has an album
       return `https://coverart.javajuke.nl/${coverArt}`;
     } else {
+      // Else return the default art
       return "../../assets/images/icons/default_cover_art.svg";
     }
   }
@@ -268,23 +279,24 @@ class SearchPage extends PolymerElement {
     e.stopPropagation();
   }
 
-  _addTrack() {
-    console.log("TODO: Add Track");
-  }
-
   _modalClick(e) {
+    // Check if the clicked element has an action
     if (e.target.dataset.action) {
       switch (e.target.dataset.action) {
         case "addToPlaylist":
+          // Get all playlists in case there where changes
           window.dispatchEvent(
             new CustomEvent("get-playlists", {
               detail: {}
             })
           );
+          // Save the previously clicked track to the playlist modal
           this.set("playlistTrack", this.get("optionsTrack"));
+          // Close the options modal
           this.set("optionsTrack", null);
           break;
         case "deleteTrack":
+          // Send an delete track event containing track id
           window.dispatchEvent(
             new CustomEvent("delete-track", {
               detail: {
@@ -293,13 +305,17 @@ class SearchPage extends PolymerElement {
               }
             })
           );
+          // Close the options modal
           this.set("optionsTrack", null);
           break;
         case "close":
+          // Close all modals
           this.set("optionsTrack", null);
           this.set("playlistTrack", null);
+          this.set("add", false);
           break;
         case "selectPlaylist":
+          // Send an add to playlist event to the app-shell containing track id and playlist id
           window.dispatchEvent(
             new CustomEvent("add-to-playlist", {
               detail: {
@@ -308,6 +324,7 @@ class SearchPage extends PolymerElement {
               }
             })
           );
+          // Close the playlist modal
           this.set("playlistTrack", null);
           break;
       }
@@ -315,28 +332,26 @@ class SearchPage extends PolymerElement {
   }
 
   _trackClick(e) {
+    // Check if the clicked element has an action
     switch (e.target.dataset.action) {
       case "play":
-        if (
-          (this.state.currentTrack &&
-            this.state.currentTrack.id !== Number(e.target.dataset.track)) ||
-          !this.state.currentTrack
-        ) {
-          window.dispatchEvent(
-            new CustomEvent("add-to-queue", {
-              detail: {
-                track: this.searchTracks.find(item => {
-                  return item.id === Number(e.target.dataset.track);
-                })
-              }
-            })
-          );
-        }
+        // Send an add to queue event to the app-shell containing the track
+        window.dispatchEvent(
+          new CustomEvent("add-to-queue", {
+            detail: {
+              track: this.searchTracks.find(item => {
+                return item.id === Number(e.target.dataset.track);
+              })
+            }
+          })
+        );
         break;
       case "options":
+        // Get the clicked track
         let track = this.searchTracks.find(item => {
           return item.id === Number(e.target.dataset.track);
         });
+        // Open the options modal for the click
         this.set("optionsTrack", track);
         break;
     }

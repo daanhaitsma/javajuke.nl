@@ -233,35 +233,50 @@ class BottomBar extends PolymerElement {
   }
 
   _activePage(page, activePage) {
+    // Check if the page is the active page
     return page === activePage ? " active" : "";
   }
 
   _showActive(page, activeTrack) {
-    let pages = ["home", "tracks", "playlists", "search", "playlist", "settings"];
+    let pages = [
+      "home",
+      "tracks",
+      "playlists",
+      "search",
+      "playlist",
+      "settings"
+    ];
+    // Check if the page has to show the active track bar
     return pages.includes(page) && activeTrack ? " active" : "";
   }
 
   _showBar(page) {
+    // Check if the bottom bar needs to be shown
     return page !== "login" && page !== "register";
   }
 
   _getProgress(time, total) {
+    // Calculate the track progress
     return (time * 100) / total || 0;
   }
 
   _getIcon(paused) {
+    // Return play or pause icon
     return paused ? "play" : "pause";
   }
 
   _getCoverArt(coverArt) {
     if (coverArt) {
+      // Return the cover art if the track has an album
       return `https://coverart.javajuke.nl/${coverArt}`;
     } else {
+      // Else return the default art
       return "../../assets/images/icons/default_cover_art.svg";
     }
   }
 
   _active(active) {
+    // Return active if true
     return active ? " active" : "";
   }
 
@@ -271,6 +286,7 @@ class BottomBar extends PolymerElement {
   }
 
   _home() {
+    // Send an navigation event to the app-shell containing the path
     window.dispatchEvent(
       new CustomEvent("set-path", {
         detail: { path: "/home", history: [] }
@@ -279,6 +295,7 @@ class BottomBar extends PolymerElement {
   }
 
   _navigate(e) {
+    // Send an navigation event to the app-shell containing the path and the history
     window.dispatchEvent(
       new CustomEvent("set-path", {
         detail: { path: e.target.dataset.path, history: ["/home"] }
@@ -289,11 +306,13 @@ class BottomBar extends PolymerElement {
   _activeTrackClick(e) {
     switch (e.target.dataset.action) {
       case "player":
+        // Send an navigation event to the app-shell containing the path
         window.dispatchEvent(
           new CustomEvent("set-path", { detail: { path: "/player" } })
         );
         break;
       case "playPause":
+        // Send an play/pause event to the app-shell
         window.dispatchEvent(
           new CustomEvent("toggle-state", {
             detail: { state: "playing" }
